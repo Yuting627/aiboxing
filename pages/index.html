@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yuting's Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --black: #0d0d0d; --white: #f5f5f5; --green: #1a3d1a; --green-light: #2d5a2d; --gap: clamp(1.5rem, 4vw, 3rem); --title-font: 'Orbitron', 'Bebas Neue', sans-serif; --title-glow: 0 0 20px rgba(45, 90, 45, 0.35), 0 0 40px rgba(45, 90, 45, 0.15); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; overflow-x: hidden; }
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0.75rem var(--gap); display: flex; align-items: center; justify-content: space-between; background: rgba(13, 13, 13, 0.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(45, 90, 45, 0.25); }
+    .nav.scrolled { border-bottom-color: var(--green); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+    .nav-inner { max-width: 1200px; width: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { color: var(--white); text-decoration: none; font-family: var(--title-font); font-weight: 600; font-size: 1.35rem; letter-spacing: 0.12em; text-shadow: var(--title-glow); }
+    .nav-brand:hover { color: var(--green-light); }
+    .nav-menu { display: flex; gap: 0.25rem; }
+    .nav-menu a { color: var(--white); text-decoration: none; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.6rem 1rem; opacity: 0.85; position: relative; }
+    .nav-menu a::after { content: ''; position: absolute; left: 1rem; right: 1rem; bottom: 0.4rem; height: 1px; background: var(--green-light); transform: scaleX(0); transition: transform 0.25s ease; }
+    .nav-menu a:hover, .nav-menu a.active { opacity: 1; color: var(--white); }
+    .nav-menu a:hover::after, .nav-menu a.active::after { transform: scaleX(1); }
+    section { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: calc(var(--gap) * 2); position: relative; }
+    .section-inner { max-width: 1200px; width: 100%; }
+    #home { background-color: var(--black); position: relative; overflow: hidden; }
+    #home .section-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+    .home-hero-image { position: absolute; right: 0; top: 0; bottom: 0; width: 55%; max-width: 720px; background-size: cover; background-position: right center; background-repeat: no-repeat; }
+    .home-hero-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, var(--black) 0%, rgba(13,13,13,0.85) 25%, transparent 55%); pointer-events: none; }
+    .home-title { font-family: var(--title-font); font-weight: 700; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: 0.12em; line-height: 0.95; color: var(--white); margin-bottom: 0.5rem; text-shadow: var(--title-glow); }
+    .home-subtitle { font-size: clamp(0.9rem, 2vw, 1.1rem); letter-spacing: 0.15em; text-transform: uppercase; color: var(--green-light); margin-bottom: 3rem; }
+    .home-contacts { display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem; }
+    .home-contact { display: flex; align-items: center; gap: 0.75rem; color: var(--white); text-decoration: none; font-size: 0.9rem; opacity: 0.9; }
+    .home-contact:hover { opacity: 1; color: var(--green-light); }
+    .home-contact img { width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1); }
+    #about { background: var(--black); }
+    #about .section-inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); align-items: center; }
+    .about-text h2 { font-family: var(--title-font); font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: 0.1em; color: var(--white); margin-bottom: 1rem; text-shadow: var(--title-glow); }
+    .about-text p { color: rgba(255,255,255,0.85); font-size: 1rem; max-width: 42ch; white-space: pre-line; }
+    .about-photo { width: 100%; max-width: 380px; aspect-ratio: 3/4; object-fit: cover; border: 2px solid var(--green); animation: slideInRight 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+    #skills { background: var(--green); }
+    #skills .section-inner { text-align: center; }
+    #skills h2 { font-family: var(--title-font); font-weight: 600; font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: 0.12em; color: var(--white); margin-bottom: 1.5rem; text-shadow: var(--title-glow); }
+    .skills-desc { max-width: 36em; margin: 0 auto 3rem; color: rgba(255,255,255,0.9); font-size: 1rem; }
+    .skills-icons { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
+    .skills-icons img { width: 56px; height: 56px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.9; }
+    #boxing { background-color: var(--black); background-size: contain; background-position: center; background-repeat: no-repeat; }
+    .boxing-header { display: grid; grid-template-columns: auto 1fr; gap: var(--gap); align-items: center; margin-bottom: 3rem; }
+    .boxing-avatar-wrap { width: 160px; height: 160px; border-radius: 50%; overflow: hidden; border: 3px solid var(--green); flex-shrink: 0; cursor: pointer; position: relative; }
+    .boxing-avatar-wrap .boxing-avatar { width: 100%; height: 100%; object-fit: cover; display: block; border: none; }
+    .boxing-avatar-wrap .boxing-avatar-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; border: none; }
+    .boxing-avatar-wrap.avatar-playing .boxing-avatar-video { display: block; }
+    .boxing-avatar-wrap.avatar-playing .boxing-avatar { display: none; }
+    .boxing-intro-overlay { position: fixed; inset: 0; z-index: 150; background: var(--black); display: none; align-items: center; justify-content: center; }
+    .boxing-intro-overlay.visible { display: flex; }
+    .boxing-intro-overlay-inner { position: fixed; left: 50%; top: 50%; width: 80vmin; height: 80vmin; margin-left: -40vmin; margin-top: -40vmin; border-radius: 16px; overflow: hidden; border: 3px solid var(--green); transition: left 0.6s ease, top 0.6s ease, width 0.6s ease, height 0.6s ease, margin 0.6s ease, border-radius 0.6s ease; }
+    .boxing-intro-overlay-inner.shrinking { border-radius: 50%; }
+    .boxing-intro-overlay-inner video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .boxing-avatar { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 3px solid var(--green); }
+    .boxing-intro-card { background: rgba(13, 13, 13, 0.45); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-radius: 14px; padding: 1.25rem 1.5rem; border: 2px solid rgba(45, 90, 45, 0.5); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 20px rgba(45, 90, 45, 0.15); }
+    .boxing-title { font-family: var(--title-font); font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: 0.1em; color: var(--white); margin-bottom: 0.5rem; text-shadow: var(--title-glow); }
+    .title-accent { color: var(--green-light); text-shadow: 0 0 16px rgba(45, 90, 45, 0.5); }
+    .boxing-intro { color: rgba(255,255,255,0.85); font-size: 0.95rem; }
+    .boxing-gallery { display: flex; flex-direction: column; gap: 1rem; padding-bottom: 0.5rem; }
+    .boxing-gallery-row { overflow: hidden; }
+    .boxing-gallery-inner { display: flex; gap: 1rem; width: max-content; }
+    .boxing-gallery-row.img-row .boxing-gallery-inner { animation: boxing-scroll-right 45s linear infinite; }
+    .boxing-gallery-row.video-row .boxing-gallery-inner { animation: boxing-scroll-left 45s linear infinite; }
+    .boxing-gallery-inner:hover { animation-play-state: paused; }
+    @keyframes boxing-scroll-right { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+    @keyframes boxing-scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .boxing-item { position: relative; flex: 0 0 200px; width: 200px; border-radius: 12px; overflow: hidden; cursor: pointer; aspect-ratio: 16/10; min-height: 0; transition: transform 0.3s ease; box-shadow: 0 2px 12px rgba(0,0,0,0.35); }
+    .boxing-item:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.45); }
+    .boxing-item img, .boxing-item video { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 12px; }
+    .boxing-item[data-type="video"] { background: var(--black); }
+    .boxing-item[data-type="video"] .boxing-item-poster { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 12px; background: var(--black); }
+    .boxing-item .play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; }
+    .boxing-item[data-type="video"] .play-overlay { opacity: 1; }
+    .boxing-item:hover .play-overlay { opacity: 1; }
+    .play-overlay::after { content: ''; margin-left: 6px; border-style: solid; border-width: 14px 0 14px 24px; border-color: transparent transparent transparent var(--white); width: 0; height: 0; }
+    .modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; padding: 2rem; }
+    .modal.active { display: flex; }
+    .modal-close { position: absolute; top: var(--gap); right: var(--gap); width: 40px; height: 40px; border: 2px solid var(--white); background: transparent; color: var(--white); font-size: 1.5rem; cursor: pointer; border-radius: 4px; }
+    .modal-close:hover { background: var(--white); color: var(--black); }
+    .modal-content { max-width: 90vw; max-height: 85vh; object-fit: contain; }
+  </style>
+</head>
+<body>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script type="application/json" id="page-data">
+{
+  "config": {
+    "paths": {
+      "pics": "../source/pics",
+      "icons": "../source/icons",
+      "videos": "../source/videos",
+      "contents": "../source/contents"
+    },
+    "pages": {
+      "home": {
+        "backgroundImage": "home-bg.jpg"
+      },
+      "about": {
+        "photo": "about-photo.jpg"
+      },
+      "boxing": {
+        "avatar": "boxing-avatar.jpg",
+        "media": [
+          {
+            "type": "image",
+            "src": "20260116145432_174_58.jpg",
+            "thumb": "20260116145432_174_58.jpg"
+          },
+          {
+            "type": "image",
+            "src": "20260116180007_177_58.jpg",
+            "thumb": "20260116180007_177_58.jpg"
+          },
+          {
+            "type": "image",
+            "src": "about-photo.jpg",
+            "thumb": "about-photo.jpg"
+          },
+          {
+            "type": "image",
+            "src": "boxing-avatar.jpg",
+            "thumb": "boxing-avatar.jpg"
+          },
+          {
+            "type": "image",
+            "src": "boxing-bg.jpg",
+            "thumb": "boxing-bg.jpg"
+          },
+          {
+            "type": "image",
+            "src": "boxing_rocks.jpg",
+            "thumb": "boxing_rocks.jpg"
+          },
+          {
+            "type": "image",
+            "src": "home-bg.jpg",
+            "thumb": "home-bg.jpg"
+          },
+          {
+            "type": "image",
+            "src": "微信图片_20251026104701_137_58.jpg",
+            "thumb": "微信图片_20251026104701_137_58.jpg"
+          },
+          {
+            "type": "image",
+            "src": "微信图片_20251030145347_144_58.jpg",
+            "thumb": "微信图片_20251030145347_144_58.jpg"
+          },
+          {
+            "type": "image",
+            "src": "微信图片_20251123105138_162_58.jpg",
+            "thumb": "微信图片_20251123105138_162_58.jpg"
+          },
+          {
+            "type": "image",
+            "src": "微信图片_20260116144615_169_58.jpg",
+            "thumb": "微信图片_20260116144615_169_58.jpg"
+          },
+          {
+            "type": "image",
+            "src": "微信图片_20260116144720_170_58.jpg",
+            "thumb": "微信图片_20260116144720_170_58.jpg"
+          },
+          {
+            "type": "video",
+            "src": "4c674ebe53b1080138561e8bccc91f23.mp4",
+            "thumb": "4c674ebe53b1080138561e8bccc91f23.jpg"
+          },
+          {
+            "type": "video",
+            "src": "e2a6f8d7693a2cbdd32992505d6642ed.mp4",
+            "thumb": "e2a6f8d7693a2cbdd32992505d6642ed.jpg"
+          },
+          {
+            "type": "video",
+            "src": "e854eb0edb8a87d38c78c79600c1bfa3.mp4",
+            "thumb": "e854eb0edb8a87d38c78c79600c1bfa3.jpg"
+          },
+          {
+            "type": "video",
+            "src": "intro.mp4",
+            "thumb": "intro.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152241_467.mp4",
+            "thumb": "微信视频2026-02-16_152241_467.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152251_221.mp4",
+            "thumb": "微信视频2026-02-16_152251_221.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152256_848.mp4",
+            "thumb": "微信视频2026-02-16_152256_848.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152303_449.mp4",
+            "thumb": "微信视频2026-02-16_152303_449.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152308_406.mp4",
+            "thumb": "微信视频2026-02-16_152308_406.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152606_529.mp4",
+            "thumb": "微信视频2026-02-16_152606_529.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152611_407.mp4",
+            "thumb": "微信视频2026-02-16_152611_407.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152617_283.mp4",
+            "thumb": "微信视频2026-02-16_152617_283.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152620_950.mp4",
+            "thumb": "微信视频2026-02-16_152620_950.jpg"
+          },
+          {
+            "type": "video",
+            "src": "微信视频2026-02-16_152625_161.mp4",
+            "thumb": "微信视频2026-02-16_152625_161.jpg"
+          }
+        ],
+        "introVideo": "intro.mp4",
+        "backgroundImage": "boxing-bg.jpg"
+      }
+    }
+  },
+  "site": {
+    "siteTitle": "Yuting's Life",
+    "menu": [
+      {
+        "id": "home",
+        "label": "HOME"
+      },
+      {
+        "id": "about",
+        "label": "ABOUT"
+      },
+      {
+        "id": "skills",
+        "label": "SKILLS"
+      },
+      {
+        "id": "boxing",
+        "label": "AI BOXING"
+      }
+    ]
+  },
+  "home": {
+    "title": "YUTING FENG",
+    "subtitle": "Data Science & Project Management",
+    "contacts": [
+      {
+        "icon": "icons/email.svg",
+        "label": "Email",
+        "value": "570463600@qq.com"
+      },
+      {
+        "icon": "icons/phone-telephone.svg",
+        "label": "Tel",
+        "value": "18621064065"
+      },
+      {
+        "icon": "icons/redbook.svg",
+        "label": "redbook",
+        "value": "@追兔子🐰的乌龟🐢"
+      }
+    ]
+  },
+  "about": {
+    "title": "About Me",
+    "intro": "Detail-oriented Data Analysis Manager with extensive experience in data science. Proficient in leading analytical teams, designing and optimizing workflows, and delivering actionable market insights to identify trends and consumer preferences.\n\n Beyond work, I live a dual life: boxing and coding. Boxing forges my grit and focus, while coding builds logic and order. AI is my superpower, turning my wildest ideas into tangible IP."
+  },
+  "skills": {
+    "title": "MY SKILLS",
+    "description": "Data analysis, visualization, and project coordination. Experienced in turning data into decisions and keeping projects on track.",
+    "softwareIcons": [
+      {
+        "src": "icons/python-logo-only.png",
+        "alt": "Python"
+      },
+      {
+        "src": "icons/mysql-logo-pure.svg",
+        "alt": "SQL"
+      },
+      {
+        "src": "icons/power-bi.svg",
+        "alt": "Power BI"
+      },
+      {
+        "src": "icons/cursor.svg",
+        "alt": "Vibe Coding"
+      },
+      {
+        "src": "icons/pmi-6.svg",
+        "alt": "Project Management"
+      }
+    ]
+  },
+  "boxing": {
+    "title": "ALL IN BOXING",
+    "intro": "This is an original IP created by me using AI, named Quan Ju De (拳锯德). It was born in October 2025.The IP is designed as a heart shape composed of a boxing glove and a chainsaw, symbolizing passion and sharpness."
+  }
+}
+  </script>
+
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand" id="nav-brand">Yuting's Life</a>
+      <div class="nav-menu" id="nav-menu"></div>
+    </div>
+  </nav>
+  <section id="home">
+    <div class="home-hero-image" id="home-hero-image"></div>
+    <div class="section-inner">
+      <h1 class="home-title" id="home-title">YUTING FENG</h1>
+      <p class="home-subtitle" id="home-subtitle">Data Science & Project Management</p>
+      <div class="home-contacts" id="home-contacts"></div>
+    </div>
+  </section>
+  <section id="about">
+    <div class="section-inner">
+      <div class="about-text">
+        <h2 id="about-title">About Me</h2>
+        <p id="about-intro"></p>
+      </div>
+      <div class="about-photo-wrap"><img class="about-photo" id="about-photo" src="" alt="Yuting" /></div>
+    </div>
+  </section>
+  <section id="skills">
+    <div class="section-inner">
+      <h2 id="skills-title">MY SKILLS</h2>
+      <p class="skills-desc" id="skills-desc"></p>
+      <div class="skills-icons" id="skills-icons"></div>
+    </div>
+  </section>
+  <section id="boxing">
+    <div class="section-inner">
+      <div class="boxing-header">
+        <div class="boxing-avatar-wrap" id="boxing-avatar-wrap">
+          <video class="boxing-avatar-video" id="boxing-avatar-video" muted playsinline loop></video>
+          <img class="boxing-avatar" id="boxing-avatar" src="" alt="Boxing" />
+        </div>
+        <div class="boxing-intro-card">
+          <h2 class="boxing-title" id="boxing-title">ALL IN BOXING</h2>
+          <p class="boxing-intro" id="boxing-intro"></p>
+        </div>
+      </div>
+      <div class="boxing-gallery" id="boxing-gallery"></div>
+    </div>
+    <div class="boxing-intro-overlay" id="boxing-intro-overlay">
+      <div class="boxing-intro-overlay-inner" id="boxing-intro-overlay-inner">
+        <video id="boxing-intro-overlay-video" muted playsinline></video>
+      </div>
+    </div>
+  </section>
+  <div class="modal" id="media-modal">
+    <button type="button" class="modal-close" id="modal-close" aria-label="关闭">&times;</button>
+    <div id="modal-content-wrap"></div>
+  </div>
+  <script>
+    var CONFIG_URL = '../source/config.json';
+    var paths = { pics: '', icons: '', videos: '', contents: '' };
+    function resolvePath(path) {
+      if (!path || !paths.pics) return path || '';
+      if (path.startsWith('pics/')) return paths.pics + '/' + path.slice(5);
+      if (path.startsWith('icons/')) return paths.icons + '/' + path.slice(6);
+      if (path.startsWith('videos/')) return paths.videos + '/' + path.slice(7);
+      return path;
+    }
+    function pathJoin(base, filename) {
+      if (!base || !filename) return '';
+      return base.replace(/\/$/, '') + '/' + filename;
+    }
+    function getPageAsset(config, pageId, key) {
+      if (!config || !config.pages || !config.pages[pageId]) return '';
+      var name = config.pages[pageId][key];
+      if (!name) return '';
+      return pathJoin(paths.pics, name);
+    }
+    function getPageMediaList(config, pageId) {
+      if (!config || !config.pages || !config.pages[pageId] || !config.pages[pageId].media) return [];
+      if (!paths.pics || !paths.videos) return [];
+      return config.pages[pageId].media.map(function(item) {
+        var src = item.type === 'video' ? pathJoin(paths.videos, item.src) : pathJoin(paths.pics, item.src);
+        var thumb = pathJoin(paths.pics, item.thumb || item.src);
+        return { type: item.type, src: src, thumb: thumb };
+      });
+    }
+    async function loadJSON(path) { var res = await fetch(path); if (!res.ok) return null; return res.json(); }
+    function escapeHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function titleWithAccent(text, mode) {
+      if (!text || typeof text !== 'string') return '';
+      var words = text.trim().split(/\s+/);
+      if (words.length === 0) return '';
+      if (words.length === 1) return mode === 'none' ? escapeHtml(words[0]) : '<span class="title-accent">' + escapeHtml(words[0]) + '</span>';
+      var start = -1, end = -1;
+      if (mode === 'none') { start = -1; end = -1; }
+      else if (mode === 'last') { start = words.length - 1; end = words.length - 1; }
+      else if (words.length === 2) { start = 1; end = 1; }
+      else { var mid = Math.floor(words.length / 2); end = mid; start = words.length % 2 ? mid : mid - 1; }
+      var html = '';
+      for (var i = 0; i < words.length; i++) {
+        if (i > 0) html += ' ';
+        html += (start >= 0 && i >= start && i <= end) ? '<span class="title-accent">' + escapeHtml(words[i]) + '</span>' : escapeHtml(words[i]);
+      }
+      return html;
+    }
+    function setNav(site) {
+      if (!site) return;
+      var brand = document.getElementById('nav-brand');
+      var menuEl = document.getElementById('nav-menu');
+      if (brand && site.siteTitle) { brand.innerHTML = titleWithAccent(site.siteTitle); var firstId = site.menu && site.menu[0] ? site.menu[0].id : 'home'; brand.href = '#' + firstId; }
+      if (menuEl && site.menu && Array.isArray(site.menu)) {
+        menuEl.innerHTML = site.menu.map(function(m, i) { return '<a href="#' + (m.id || '') + '" class="' + (i === 0 ? 'active' : '') + '">' + (m.label || m.id || '') + '</a>'; }).join('');
+      }
+    }
+    function setHome(data, config) {
+      if (!data) return;
+      document.getElementById('home-title').innerHTML = titleWithAccent(data.title || 'YUTING FENG');
+      document.getElementById('home-subtitle').textContent = data.subtitle || 'Data Science & Project Management';
+      var heroEl = document.getElementById('home-hero-image');
+      var bg = config ? getPageAsset(config, 'home', 'backgroundImage') : '';
+      if (heroEl && bg) heroEl.style.backgroundImage = 'url(' + bg + ')';
+      var wrap = document.getElementById('home-contacts');
+      wrap.innerHTML = (data.contacts || []).map(function(c) {
+        var href = c.value.indexOf('http') === 0 ? c.value : (c.label === 'Email' ? 'mailto:' + c.value : 'https://' + c.value);
+        return '<a class="home-contact" href="' + href + '" target="_blank" rel="noopener"><img src="' + resolvePath(c.icon) + '" alt="" /><span>' + c.value + '</span></a>';
+      }).join('');
+    }
+    function setAbout(data, config) {
+      if (!data) return;
+      document.getElementById('about-title').innerHTML = titleWithAccent(data.title || 'About Me');
+      var introEl = document.getElementById('about-intro');
+      var intro = (data.intro || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      introEl.innerHTML = intro.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+      var photoUrl = config ? getPageAsset(config, 'about', 'photo') : '';
+      if (photoUrl) document.getElementById('about-photo').src = photoUrl;
+    }
+    function setSkills(data) {
+      if (!data) return;
+      document.getElementById('skills-title').innerHTML = titleWithAccent(data.title || 'MY SKILLS', 'none');
+      document.getElementById('skills-desc').textContent = data.description || '';
+      var wrap = document.getElementById('skills-icons');
+      wrap.innerHTML = (data.softwareIcons || []).map(function(s) { return '<img src="' + resolvePath(s.src) + '" alt="' + (s.alt || '') + '" title="' + (s.alt || '') + '" />'; }).join('');
+    }
+    function setBoxing(data, config) {
+      if (!data) return;
+      var boxingSection = document.getElementById('boxing');
+      var bgUrl = config ? getPageAsset(config, 'boxing', 'backgroundImage') : '';
+      if (boxingSection && bgUrl) boxingSection.style.backgroundImage = 'url(' + bgUrl + ')';
+      var avatarUrl = config ? getPageAsset(config, 'boxing', 'avatar') : '';
+      var avatarImg = document.getElementById('boxing-avatar');
+      if (avatarImg) avatarImg.src = avatarUrl || '';
+      document.getElementById('boxing-title').innerHTML = titleWithAccent(data.title || 'ALL IN BOXING', 'last');
+      document.getElementById('boxing-intro').textContent = data.intro || '';
+      var wrap = document.getElementById('boxing-avatar-wrap');
+      var overlay = document.getElementById('boxing-intro-overlay');
+      var overlayInner = document.getElementById('boxing-intro-overlay-inner');
+      var overlayVideo = document.getElementById('boxing-intro-overlay-video');
+      var introVideoName = config && config.pages && config.pages.boxing && config.pages.boxing.introVideo;
+      var introVideoUrl = introVideoName && paths.videos ? pathJoin(paths.videos, introVideoName) : '';
+      function startIntroPlay() {
+        if (!overlay || !overlayInner || !overlayVideo || !introVideoUrl) return;
+        overlayInner.removeAttribute('style');
+        overlayInner.classList.remove('shrinking');
+        if (avatarImg) avatarImg.style.visibility = 'hidden';
+        overlay.classList.add('visible');
+        overlayVideo.src = introVideoUrl;
+        overlayVideo.currentTime = 0;
+        overlayVideo.play().catch(function() {});
+      }
+      function onIntroEnded() {
+        if (!wrap || !overlayInner || !overlay) return;
+        var r = wrap.getBoundingClientRect();
+        overlayInner.style.left = r.left + 'px';
+        overlayInner.style.top = r.top + 'px';
+        overlayInner.style.width = r.width + 'px';
+        overlayInner.style.height = r.height + 'px';
+        overlayInner.style.marginLeft = '0';
+        overlayInner.style.marginTop = '0';
+        overlayInner.classList.add('shrinking');
+        overlayInner.addEventListener('transitionend', function done() {
+          overlayInner.removeEventListener('transitionend', done);
+          overlay.classList.remove('visible');
+          overlayInner.classList.remove('shrinking');
+          overlayInner.removeAttribute('style');
+          if (avatarImg) avatarImg.style.visibility = '';
+        }, { once: true });
+      }
+      if (overlayVideo) overlayVideo.onended = onIntroEnded;
+      var avatarVideo = document.getElementById('boxing-avatar-video');
+      if (wrap && introVideoUrl) {
+        wrap.addEventListener('mouseenter', function() {
+          if (overlay.classList.contains('visible')) return;
+          if (avatarVideo) {
+            avatarVideo.src = introVideoUrl;
+            avatarVideo.currentTime = 0;
+            avatarVideo.loop = false;
+            avatarVideo.play().catch(function() {});
+            wrap.classList.add('avatar-playing');
+          }
+        });
+        wrap.addEventListener('mouseleave', function() {
+          if (avatarVideo) {
+            avatarVideo.pause();
+            wrap.classList.remove('avatar-playing');
+          }
+        });
+        if (avatarVideo) avatarVideo.onended = function() { wrap.classList.remove('avatar-playing'); };
+      }
+      window.__boxingStartIntro = introVideoUrl ? startIntroPlay : null;
+      var gallery = document.getElementById('boxing-gallery');
+      var mediaList = config ? getPageMediaList(config, 'boxing') : [];
+      var imageList = mediaList.filter(function(m) { return m.type === 'image'; });
+      var videoList = mediaList.filter(function(m) { return m.type === 'video'; });
+      function imageItemHtml(m) { return '<div class="boxing-item" data-type="image" data-src="' + m.src + '"><img src="' + m.thumb + '" alt="" /></div>'; }
+      function videoItemHtml(m) { return '<div class="boxing-item" data-type="video" data-src="' + m.src + '"><video class="boxing-item-poster" src="' + m.src + '" preload="metadata" muted playsinline></video><div class="play-overlay"></div></div>'; }
+      gallery.innerHTML = '';
+      if (imageList.length > 0) { var imgRow = document.createElement('div'); imgRow.className = 'boxing-gallery-row img-row'; var imgInner = document.createElement('div'); imgInner.className = 'boxing-gallery-inner'; imgInner.innerHTML = imageList.map(imageItemHtml).join('') + imageList.map(imageItemHtml).join(''); imgRow.appendChild(imgInner); gallery.appendChild(imgRow); }
+      if (videoList.length > 0) { var vidRow = document.createElement('div'); vidRow.className = 'boxing-gallery-row video-row'; var vidInner = document.createElement('div'); vidInner.className = 'boxing-gallery-inner'; vidInner.innerHTML = videoList.map(videoItemHtml).join('') + videoList.map(videoItemHtml).join(''); vidRow.appendChild(vidInner); gallery.appendChild(vidRow); }
+      gallery.querySelectorAll('.boxing-item').forEach(function(el) {
+        el.addEventListener('click', function() {
+          var type = el.dataset.type, src = el.dataset.src, modal = document.getElementById('media-modal'), wrap = document.getElementById('modal-content-wrap');
+          wrap.innerHTML = type === 'video' ? '<video class="modal-content" src="' + src + '" controls autoplay></video>' : '<img class="modal-content" src="' + src + '" alt="" />';
+          modal.classList.add('active');
+        });
+      });
+    }
+    document.getElementById('modal-close').addEventListener('click', function() { var wrap = document.getElementById('modal-content-wrap'); var v = wrap.querySelector('video'); if (v) v.pause(); wrap.innerHTML = ''; document.getElementById('media-modal').classList.remove('active'); });
+    document.getElementById('media-modal').addEventListener('click', function(e) { if (e.target.id === 'media-modal') document.getElementById('modal-close').click(); });
+    function updateActiveNav() {
+      var sections = document.querySelectorAll('section[id]'), navLinks = document.querySelectorAll('.nav-menu a'), top = window.scrollY + 80, current = 'home';
+      sections.forEach(function(s) { if (s.offsetTop <= top) current = s.id; });
+      navLinks.forEach(function(a) { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+    }
+    window.addEventListener('scroll', function() { updateActiveNav(); var nav = document.getElementById('nav'); if (nav) nav.classList.toggle('scrolled', window.scrollY > 60); });
+        (function init() {
+      var el = document.getElementById('page-data');
+      if (!el) return;
+      var data = JSON.parse(el.textContent);
+      var config = data.config;
+      if (!config || !config.paths) return;
+      paths.pics = config.paths.pics || '';
+      paths.icons = config.paths.icons || '';
+      paths.videos = config.paths.videos || '';
+      paths.contents = config.paths.contents || '';
+      var site = data.site, home = data.home, about = data.about, skills = data.skills, boxing = data.boxing;
+      if (site) setNav(site);
+      setHome(home, config);
+      setAbout(about, config);
+      setSkills(skills);
+      setBoxing(boxing, config);
+      var navMenu = document.getElementById('nav-menu');
+      if (navMenu) navMenu.addEventListener('click', function(e) {
+        var a = e.target.closest('a');
+        if (a && a.getAttribute('href') === '#boxing' && typeof window.__boxingStartIntro === 'function') {
+          setTimeout(window.__boxingStartIntro, 100);
+        }
+      });
+      updateActiveNav();
+    })();
+  </script>
+</body>
+</html>

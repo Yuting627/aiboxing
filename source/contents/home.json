@@ -1,0 +1,9 @@
+{
+  "title": "YUTING FENG",
+  "subtitle": "Data Science & Project Management",
+  "contacts": [
+    { "icon": "icons/email.svg", "label": "Email", "value": "570463600@qq.com" },
+    { "icon": "icons/phone-telephone.svg", "label": "Tel", "value": "18621064065" },
+    { "icon": "icons/redbook.svg", "label": "redbook", "value": "@追兔子🐰的乌龟🐢" }
+  ]
+}

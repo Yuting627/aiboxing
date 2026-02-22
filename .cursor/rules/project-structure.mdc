@@ -1,0 +1,12 @@
+---
+description: 
+alwaysApply: true
+---
+项目构架
+- pages/          分页面代码（主站在 pages/index.html）
+- source/         所有图片、icon、文字等配置文件，方便修改
+  - config.json   source 路径配置：paths（pics/icons/videos/contents 目录路径）、pages（各页面不同位置引用的图片/媒体文件名）；页面通过读取此文件获取图片路径。顶部菜单来自 site.json 的 menu，名称为页面名称，点击跳转对应页面
+  - pics/         页面图片（背景、照片、拳击图等）
+  - icons/        页面 icon（联系方式、技能图标）
+  - videos/       页面视频
+  - contents/     页面文字与配置（JSON）
