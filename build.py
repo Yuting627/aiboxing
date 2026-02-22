@@ -158,7 +158,7 @@ def main():
     data = build_page_data()
     os.makedirs(PAGES, exist_ok=True)
     template_path = os.path.join(PAGES, "index.html")
-    out_path = os.path.join(PAGES, "index.html")
+    out_path = os.path.join(ROOT, "index.html")
 
     default_tpl = _default_template_path()
     if os.path.isfile(template_path):
