@@ -220,7 +220,7 @@
       if (!paths.pics || !paths.videos) return [];
       return config.pages[pageId].media.map(function(item) {
         var src = item.type === 'video' ? pathJoin(paths.videos, item.src) : pathJoin(paths.pics, item.src);
-        var thumb = pathJoin(paths.pics, item.thumb || item.src);
+        var thumb = item.type === 'video' ? pathJoin(paths.videos, item.thumb || item.src) : pathJoin(paths.pics, item.thumb || item.src);
         return { type: item.type, src: src, thumb: thumb };
       });
     }
@@ -347,12 +347,29 @@
         if (avatarVideo) avatarVideo.onended = function() { wrap.classList.remove('avatar-playing'); };
       }
       window.__boxingStartIntro = introVideoUrl ? startIntroPlay : null;
+      if (introVideoUrl && typeof IntersectionObserver !== 'undefined') {
+        var boxingSection = document.getElementById('boxing');
+        if (boxingSection) {
+          var preloaded = false;
+          var preloadObs = new IntersectionObserver(function(entries) {
+            if (preloaded || !entries[0] || !entries[0].isIntersecting) return;
+            preloaded = true;
+            var link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'video';
+            link.href = introVideoUrl;
+            document.head.appendChild(link);
+            preloadObs.disconnect();
+          }, { rootMargin: '100px', threshold: 0 });
+          preloadObs.observe(boxingSection);
+        }
+      }
       var gallery = document.getElementById('boxing-gallery');
       var mediaList = config ? getPageMediaList(config, 'boxing') : [];
       var imageList = mediaList.filter(function(m) { return m.type === 'image'; });
       var videoList = mediaList.filter(function(m) { return m.type === 'video'; });
       function imageItemHtml(m) { return '<div class="boxing-item" data-type="image" data-src="' + m.src + '"><img src="' + m.thumb + '" alt="" /></div>'; }
-      function videoItemHtml(m) { return '<div class="boxing-item" data-type="video" data-src="' + m.src + '"><video class="boxing-item-poster" src="' + m.src + '" preload="metadata" muted playsinline></video><div class="play-overlay"></div></div>'; }
+      function videoItemHtml(m) { return '<div class="boxing-item" data-type="video" data-src="' + m.src + '"><video class="boxing-item-poster" poster="' + m.thumb + '" preload="none" muted playsinline></video><div class="play-overlay"></div></div>'; }
       gallery.innerHTML = '';
       if (imageList.length > 0) { var imgRow = document.createElement('div'); imgRow.className = 'boxing-gallery-row img-row'; var imgInner = document.createElement('div'); imgInner.className = 'boxing-gallery-inner'; imgInner.innerHTML = imageList.map(imageItemHtml).join('') + imageList.map(imageItemHtml).join(''); imgRow.appendChild(imgInner); gallery.appendChild(imgRow); }
       if (videoList.length > 0) { var vidRow = document.createElement('div'); vidRow.className = 'boxing-gallery-row video-row'; var vidInner = document.createElement('div'); vidInner.className = 'boxing-gallery-inner'; vidInner.innerHTML = videoList.map(videoItemHtml).join('') + videoList.map(videoItemHtml).join(''); vidRow.appendChild(vidInner); gallery.appendChild(vidRow); }
