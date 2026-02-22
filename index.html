@@ -85,6 +85,58 @@
     .modal-close { position: absolute; top: var(--gap); right: var(--gap); width: 40px; height: 40px; border: 2px solid var(--white); background: transparent; color: var(--white); font-size: 1.5rem; cursor: pointer; border-radius: 4px; }
     .modal-close:hover { background: var(--white); color: var(--black); }
     .modal-content { max-width: 90vw; max-height: 85vh; object-fit: contain; }
+
+    /* 手机端适配 */
+    .nav-toggle { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: var(--white); cursor: pointer; flex-shrink: 0; }
+    .nav-toggle span { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .nav-toggle span + span { margin-top: 5px; }
+    .nav.open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+    .nav.open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 768px) {
+      .nav { padding: 0.5rem var(--gap); }
+      .nav-inner { position: relative; }
+      .nav-toggle { display: flex; flex-direction: column; }
+      .nav-menu { position: fixed; top: 52px; left: 0; right: 0; flex-direction: column; background: rgba(13, 13, 13, 0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(45, 90, 45, 0.3); padding: 0.5rem 0; max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.3s ease, opacity 0.25s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+      .nav.open .nav-menu { max-height: 280px; opacity: 1; }
+      body.nav-menu-open { overflow: hidden; }
+      .nav-menu a { padding: 0.85rem var(--gap); font-size: 0.8rem; }
+      section { padding: calc(var(--gap) * 1.2); min-height: auto; padding-top: 5rem; padding-bottom: 4rem; }
+      #home { min-height: 100vh; padding-top: 4rem; }
+      #home .section-inner { align-items: center; text-align: center; }
+      .home-hero-image { width: 100%; max-width: none; height: 45%; min-height: 220px; top: 0; background-position: center 30%; }
+      .home-hero-image::after { background: linear-gradient(to bottom, transparent 0%, rgba(13,13,13,0.3) 40%, var(--black) 75%); }
+      .home-title { font-size: clamp(2rem, 10vw, 3.5rem); text-align: center; }
+      .home-subtitle { font-size: 0.8rem; margin-bottom: 2rem; text-align: center; }
+      .home-contacts { justify-content: center; gap: 1rem 1.5rem; }
+      .home-contact { font-size: 0.85rem; }
+      .home-contact span { word-break: break-all; }
+      #about .section-inner { grid-template-columns: 1fr; gap: 1.5rem; text-align: center; }
+      #about .about-text { order: 1; }
+      #about .about-text p { max-width: none; margin: 0 auto; }
+      #about .about-photo-wrap { order: 2; display: flex; justify-content: center; }
+      .about-photo { max-width: 280px; margin: 0 auto; }
+      #skills .section-inner { padding: 0 0.5rem; }
+      #skills h2 { font-size: clamp(1.75rem, 6vw, 2.5rem); margin-bottom: 1rem; }
+      .skills-desc { margin-bottom: 2rem; font-size: 0.95rem; }
+      .skills-icons { gap: 1.25rem; }
+      .skills-icons img { width: 44px; height: 44px; }
+      .boxing-header { grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2rem; text-align: center; }
+      .boxing-avatar-wrap { width: 120px; height: 120px; margin: 0 auto; }
+      .boxing-intro-card { padding: 1rem 1.25rem; }
+      .boxing-title { font-size: clamp(1.5rem, 5vw, 2.25rem); }
+      .boxing-intro { font-size: 0.9rem; }
+      .boxing-item { flex: 0 0 160px; width: 160px; }
+      .boxing-intro-overlay-inner { width: 92vmin; height: 92vmin; margin-left: -46vmin; margin-top: -46vmin; }
+      .modal { padding: 1rem; align-items: flex-start; padding-top: 3.5rem; }
+      .modal-close { top: 0.75rem; right: 0.75rem; width: 36px; height: 36px; font-size: 1.25rem; }
+      .modal-content { max-height: 80vh; }
+    }
+    @media (max-width: 480px) {
+      .home-title { letter-spacing: 0.06em; }
+      .home-subtitle { letter-spacing: 0.1em; }
+      .boxing-item { flex: 0 0 140px; width: 140px; }
+    }
   </style>
 </head>
 <body>
@@ -348,6 +400,7 @@
   <nav class="nav" id="nav">
     <div class="nav-inner">
       <a href="#" class="nav-brand" id="nav-brand">Yuting's Life</a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
       <div class="nav-menu" id="nav-menu"></div>
     </div>
   </nav>
@@ -576,6 +629,16 @@
       navLinks.forEach(function(a) { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
     }
     window.addEventListener('scroll', function() { updateActiveNav(); var nav = document.getElementById('nav'); if (nav) nav.classList.toggle('scrolled', window.scrollY > 60); });
+    (function navMobile() {
+      var nav = document.getElementById('nav');
+      var toggle = document.getElementById('nav-toggle');
+      var menu = document.getElementById('nav-menu');
+      if (!toggle || !menu) return;
+      toggle.addEventListener('click', function() { nav.classList.toggle('open'); document.body.classList.toggle('nav-menu-open', nav.classList.contains('open')); });
+      function closeMenu() { nav.classList.remove('open'); document.body.classList.remove('nav-menu-open'); }
+      menu.addEventListener('click', function(e) { if (e.target.closest('a')) closeMenu(); });
+      document.addEventListener('click', function(e) { if (nav.classList.contains('open') && !nav.contains(e.target)) closeMenu(); });
+    })();
         (function init() {
       var el = document.getElementById('page-data');
       if (!el) return;
