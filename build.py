@@ -74,6 +74,10 @@ def build_page_data() -> dict:
     skills = load_json(os.path.join(CONTENTS, "skills.json"))
     boxing = load_json(os.path.join(CONTENTS, "boxing.json"))
 
+    # Skills 已合并到 About 页面，菜单中不再保留 SKILLS 项
+    if site and isinstance(site.get("menu"), list):
+        site = {**site, "menu": [m for m in site["menu"] if m.get("id") != "skills"]}
+
     # 读取后不把 \n 当作换行：将字符串中的真实换行符改回字面量 \n，由前端用 <br> 渲染
     def preserve_literal_backslash_n(obj):
         if isinstance(obj, dict):

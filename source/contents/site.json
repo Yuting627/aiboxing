@@ -3,7 +3,6 @@
   "menu": [
     { "id": "home", "label": "HOME" },
     { "id": "about", "label": "ABOUT" },
-    { "id": "skills", "label": "SKILLS" },
     { "id": "boxing", "label": "AI BOXING" }
   ]
 }
