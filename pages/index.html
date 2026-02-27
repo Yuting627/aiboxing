@@ -250,6 +250,12 @@
     .home-contact:hover { border-color: rgba(160, 240, 105, 0.5); box-shadow: 0 0 24px rgba(160, 240, 105, 0.2); transform: translateY(-2px); }
     .home-contact img { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); }
 
+    /* 页面宽度不足以完整显示联系方式时，改为竖排等宽 */
+    @media (max-width: 840px) {
+      .home-contacts { flex-direction: column; align-items: stretch; }
+      .home-contact { flex: none; width: 100%; }
+    }
+
     /* About — 左侧：About Me 纯文字 + My Skills 卡片（无 About 卡片）；右侧：图片；左右等高，一屏展示 */
     #about { background: transparent; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     #about .section-inner {
@@ -454,8 +460,7 @@
       .home-hero-image::after { background: linear-gradient(to bottom, transparent 0%, hsl(var(--bg)) 70%); }
       .home-title { text-align: center; }
       .home-subtitle { text-align: center; margin-bottom: 1.5rem; }
-      .home-contacts { justify-content: center; flex-direction: column; align-items: stretch; }
-      .home-contact { flex: none; width: 100%; }
+      .home-contacts { justify-content: center; }
       #about .section-inner { grid-template-columns: 1fr; grid-template-rows: auto auto auto; height: auto; max-height: none; gap: 1.25rem; }
       .about-left-col { grid-column: 1; grid-row: auto; order: 0; flex-direction: column; display: contents; }
       .about-text { order: 1; }
