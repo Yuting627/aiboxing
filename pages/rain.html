@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Now You See Me — Gesture Rain</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&family=Orbitron:wght@500;600;700&family=Source+Sans+3:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* Index-style variables for start screen */
+    :root {
+      --bg: 220 20% 5%;
+      --glow-hex: #a0f069;
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --radius: 0.875rem;
+      --radius-card: 24px;
+      --muted-alpha: rgba(255, 255, 255, 0.55);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #06050c; }
+    body { font-family: 'Source Sans 3', sans-serif; color: rgba(255,255,255,0.9); }
+
+    #rain-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+    #rain-canvas.freeze { cursor: wait; }
+
+    /* Center hero text: gray transparent (rain shows through) + flowing light */
+    #hero-text-wrap { position: fixed; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    #hero-text-bg { font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(2.5rem, 12vw, 8rem); letter-spacing: 0.15em; line-height: 1.1; text-align: center;
+      color: rgba(80,85,100,0.32); text-transform: uppercase; padding: 0 0.1em; max-width: 95vw; }
+    #hero-text-shine { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #hero-text-shine span { font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(2.5rem, 12vw, 8rem); letter-spacing: 0.15em; line-height: 1.1; text-align: center; text-transform: uppercase;
+      background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.75) 45%, rgba(220,210,255,0.9) 50%, rgba(255,255,255,0.75) 55%, transparent 65%, transparent 100%);
+      background-size: 220% 100%; background-clip: text; -webkit-background-clip: text; color: transparent;
+      animation: shine 4s ease-in-out infinite; padding: 0 0.1em; max-width: 95vw; }
+    @keyframes shine { 0% { background-position: 150% 50%; } 100% { background-position: -50% 50%; } }
+    /* Shine responds to gesture mode */
+    #hero-text-wrap.mode-play #hero-text-shine span { animation: shine 4s ease-in-out infinite; animation-play-state: running; }
+    #hero-text-wrap.mode-pause #hero-text-shine span { animation-play-state: paused; }
+    #hero-text-wrap.mode-freeze #hero-text-shine span { animation-play-state: paused; }
+    #hero-text-wrap.mode-slowmo #hero-text-shine span { animation: shine 12s ease-in-out infinite; animation-play-state: running; }
+
+    /* Vignette + top spotlight */
+    #vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(ellipse 80% 70% at 50% 0%, transparent 45%, rgba(0,0,0,0.4) 100%),
+                  radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0,0,0,0.5) 100%); }
+    #scan-overlay { position: fixed; inset: 0; z-index: 3; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
+
+    /* Camera preview for gesture input */
+    #cam-wrap { position: fixed; bottom: 16px; right: 16px; z-index: 5; width: 160px; height: 120px;
+      border-radius: 8px; overflow: hidden; border: 1px solid rgba(120,80,200,0.4);
+      box-shadow: 0 0 24px rgba(80,60,180,0.2);
+      bottom: max(16px, env(safe-area-inset-bottom)); right: max(16px, env(safe-area-inset-right)); }
+    #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+
+    /* Top bar: title, mode, hint */
+    #ui { position: fixed; top: 0; left: 0; right: 0; z-index: 3; padding: 20px 24px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-left: max(24px, env(safe-area-inset-left));
+      padding-right: max(24px, env(safe-area-inset-right));
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      background: linear-gradient(180deg, rgba(6,5,12,0.85) 0%, transparent 100%); }
+    #title { font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 0.25em; color: rgba(200,180,255,0.95); text-transform: uppercase; }
+    #mode { font-size: 0.85rem; letter-spacing: 0.15em; color: rgba(180,160,255,0.9); text-transform: uppercase; }
+    #hint { font-size: 0.75rem; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; }
+
+    /* Gesture legend */
+    #legend { position: fixed; bottom: 16px; left: 16px; z-index: 5;
+      bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left));
+      padding: 12px 16px; background: rgba(10,8,22,0.88); border: 1px solid rgba(100,80,180,0.35);
+      border-radius: 8px; font-size: 0.7rem; line-height: 1.8; color: rgba(220,210,255,0.85);
+      letter-spacing: 0.06em; max-width: calc(100vw - 200px); }
+    #legend strong { color: rgba(200,170,255,0.95); }
+
+    /* Start screen — 与 index.html 一致：黑色科技感 · 毛玻璃 · 荧光绿 */
+    #start-screen {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 0%, hsl(var(--bg)) 70%);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    #start-screen::before {
+      content: ''; position: absolute; width: 120vmax; height: 120vmax; left: 50%; top: 50%;
+      margin-left: -60vmax; margin-top: -60vmax;
+      background: radial-gradient(circle, rgba(160, 240, 105, 0.22) 0%, rgba(160, 240, 105, 0.06) 25%, transparent 50%);
+      border-radius: 50%; pointer-events: none;
+    }
+    #start-screen.hidden { display: none; }
+    #start-screen .start-card {
+      position: relative; max-width: 480px; width: 100%;
+      padding: 2rem 2.25rem; border-radius: var(--radius-card);
+      background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04);
+      text-align: center;
+    }
+    #start-screen .start-card::before {
+      content: ''; position: absolute; inset: -2px; z-index: -1; border-radius: calc(var(--radius-card) + 2px);
+      background: linear-gradient(135deg, rgba(160, 240, 105, 0.2), transparent 50%, rgba(160, 240, 105, 0.08)); opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    #start-screen .start-card:hover::before { opacity: 1; }
+    #start-screen h1 {
+      font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: clamp(1.35rem, 4vw, 1.9rem);
+      color: #fff; margin-bottom: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; text-align: center;
+    }
+    #start-screen h1 .accent { color: var(--glow-hex); text-shadow: 0 0 20px rgba(160, 240, 105, 0.4); }
+    #start-screen p { color: var(--muted-alpha); font-size: 0.9375rem; line-height: 1.6; margin-bottom: 1.5rem; text-align: center; }
+    #start-btn {
+      display: block; width: 100%; max-width: 280px; margin: 0 auto;
+      font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.75rem 1.5rem; color: var(--glow-hex); background: rgba(160, 240, 105, 0.12);
+      border: 1px solid rgba(160, 240, 105, 0.4); border-radius: var(--radius);
+      cursor: pointer; transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+    #start-btn:hover { background: rgba(160, 240, 105, 0.2); box-shadow: 0 0 24px rgba(160, 240, 105, 0.25); transform: scale(1.02); }
+    #start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    #start-btn:active { transform: scale(0.98); }
+    #load-error { color: #f88; font-size: 0.8125rem; margin-top: 1rem; text-align: center; }
+    @media (max-width: 480px) {
+      #legend { font-size: 0.65rem; padding: 10px 12px; }
+      #cam-wrap { width: 120px; height: 90px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <div class="start-card">
+      <h1>Now You See Me <span class="accent">Rain</span></h1>
+      <p>Gesture-controlled rain, inspired by the film. Allow camera access, then use hand gestures: open palm to play, fist to pause, pinch for slow-motion, palm forward to freeze. Works on mobile with HTTPS or localhost.</p>
+      <button id="start-btn">Start camera</button>
+      <div id="load-error" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <canvas id="rain-canvas"></canvas>
+  <div id="hero-text-wrap" class="mode-play">
+    <span id="hero-text-bg">NOW YOU SEE ME</span>
+    <div id="hero-text-shine"><span>NOW YOU SEE ME</span></div>
+  </div>
+  <div id="vignette"></div>
+  <div id="scan-overlay"></div>
+
+  <div id="ui">
+    <span id="title">Now You See the Rain</span>
+    <span id="mode">—</span>
+    <span id="hint">Control rain with gestures</span>
+  </div>
+  <div id="legend">
+    <strong>Fist</strong> Pause &nbsp;|&nbsp; <strong>Open palm</strong> Play &nbsp;|&nbsp; <strong>Pinch</strong> Slow-mo &nbsp;|&nbsp; <strong>Palm forward</strong> Freeze
+  </div>
+  <div id="cam-wrap" style="display:none;">
+    <video id="webcam" autoplay playsinline muted></video>
+  </div>
+
+  <script type="module">
+    const canvas = document.getElementById('rain-canvas');
+    const ctx = canvas.getContext('2d');
+    const video = document.getElementById('webcam');
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const loadError = document.getElementById('load-error');
+    const modeEl = document.getElementById('mode');
+    const camWrap = document.getElementById('cam-wrap');
+    const heroTextWrap = document.getElementById('hero-text-wrap');
+
+    const MODE_PLAY = 'play';
+    const MODE_PAUSE = 'pause';
+    const MODE_FREEZE = 'freeze';
+    const MODE_SLOWMO = 'slowmo';
+
+    let handLandmarker = null;
+    let visionModule = null;
+    let animationId = null;
+    let drops = [];
+    let mode = MODE_PLAY;
+    let speedFactor = 1;
+    let freezeFrame = null;
+    const SLOWMO_FACTOR = 0.25;
+    const RAIN_COUNT = 280;
+    const COLORS = [
+      'rgba(180,200,255,0.7)',
+      'rgba(160,180,240,0.5)',
+      'rgba(200,210,255,0.6)',
+      'rgba(140,160,220,0.4)',
+    ];
+
+    function setMode(m) {
+      mode = m;
+      if (m === MODE_FREEZE) {
+        if (!freezeFrame && ctx && canvas.width) freezeFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      } else {
+        freezeFrame = null;
+      }
+      if (m === MODE_SLOWMO) speedFactor = SLOWMO_FACTOR;
+      else if (m === MODE_PLAY) speedFactor = 1;
+      else speedFactor = 0;
+      const labels = { play: 'Play', pause: 'Pause', freeze: 'Freeze', slowmo: 'Slow-mo' };
+      modeEl.textContent = labels[m] || '—';
+      canvas.classList.toggle('freeze', m === MODE_FREEZE);
+      if (heroTextWrap) heroTextWrap.className = 'mode-' + m;
+    }
+
+    function initDrops() {
+      drops = [];
+      for (let i = 0; i < RAIN_COUNT; i++) {
+        drops.push({
+          x: Math.random() * (canvas.width + 200) - 100,
+          y: Math.random() * canvas.height,
+          len: 8 + Math.random() * 18,
+          speed: 2 + Math.random() * 6,
+          opacity: 0.4 + Math.random() * 0.5,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)]
+        });
+      }
+    }
+
+    function resize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        initDrops();
+      }
+    }
+
+    function drawRain(dt) {
+      const w = canvas.width;
+      const h = canvas.height;
+      if (mode === MODE_FREEZE) {
+        if (freezeFrame) {
+          ctx.putImageData(freezeFrame, 0, 0);
+        } else {
+          ctx.fillStyle = 'rgba(6,5,12,0.12)';
+          ctx.fillRect(0, 0, w, h);
+          for (const d of drops) {
+            const g = ctx.createLinearGradient(d.x, d.y - d.len, d.x, d.y + 4);
+            g.addColorStop(0, 'rgba(0,0,0,0)');
+            g.addColorStop(0.3, d.color.replace(/[\d.]+\)$/, d.opacity * 0.5 + ')'));
+            g.addColorStop(1, d.color.replace(/[\d.]+\)$/, d.opacity + ')'));
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y - d.len);
+            ctx.lineTo(d.x, d.y);
+            ctx.stroke();
+          }
+          freezeFrame = ctx.getImageData(0, 0, w, h);
+        }
+        return;
+      }
+      ctx.fillStyle = 'rgba(6,5,12,0.12)';
+      ctx.fillRect(0, 0, w, h);
+      const move = mode === MODE_PAUSE ? 0 : speedFactor * dt / 16;
+      for (const d of drops) {
+        d.y += d.speed * move;
+        if (d.y > h + d.len) {
+          d.y = -d.len;
+          d.x = Math.random() * (w + 200) - 100;
+        }
+        const g = ctx.createLinearGradient(d.x, d.y - d.len, d.x, d.y + 4);
+        g.addColorStop(0, 'rgba(0,0,0,0)');
+        g.addColorStop(0.3, d.color.replace(/[\d.]+\)$/, d.opacity * 0.5 + ')'));
+        g.addColorStop(1, d.color.replace(/[\d.]+\)$/, d.opacity + ')'));
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y - d.len);
+        ctx.lineTo(d.x, d.y);
+        ctx.stroke();
+      }
+    }
+
+    function tick(t) {
+      const dt = t - (tick.last || t);
+      tick.last = t;
+      detectFrame();
+      drawRain(dt);
+      animationId = requestAnimationFrame(tick);
+    }
+
+    function recognizeGesture(landmarks) {
+      const thumb = landmarks[4];
+      const index = landmarks[8];
+      const middle = landmarks[12];
+      const ring = landmarks[16];
+      const pinky = landmarks[20];
+      const wrist = landmarks[0];
+      const middleBase = landmarks[9];
+      const indexBase = landmarks[5];
+      const pinchDist = Math.hypot(thumb.x - index.x, thumb.y - index.y);
+      const fingersUp = [index, middle, ring, pinky].filter((f, i) => f.y < middleBase.y).length;
+      const thumbOut = thumb.x < indexBase.x;
+      const handOpen = fingersUp >= 3 && pinchDist > 0.12;
+      const fist = fingersUp <= 1 && pinchDist > 0.08;
+      const pinch = pinchDist < 0.06;
+      const palmForward = fingersUp >= 4 && Math.abs(middle.y - wrist.y) < 0.15;
+      if (pinch) return MODE_SLOWMO;
+      if (palmForward) return MODE_FREEZE;
+      if (fist) return MODE_PAUSE;
+      if (handOpen) return MODE_PLAY;
+      return null;
+    }
+
+    function detectFrame() {
+      if (!video.videoWidth || !handLandmarker) return;
+      try {
+        const result = handLandmarker.detectForVideo(video, performance.now());
+        if (result.landmarks && result.landmarks[0]) {
+          const gesture = recognizeGesture(result.landmarks[0]);
+          if (gesture) setMode(gesture);
+        }
+      } catch (_) {}
+    }
+
+    async function initHands() {
+      if (!visionModule) {
+        const mod = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.9/vision_bundle.mjs');
+        visionModule = mod.FaceLandmarker ? mod : (mod.default || mod);
+        if (!visionModule || !visionModule.HandLandmarker) throw new Error('MediaPipe hands module failed to load');
+      }
+      const vision = await visionModule.FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.9/wasm'
+      );
+      handLandmarker = await visionModule.HandLandmarker.createFromOptions(vision, {
+        baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task' },
+        runningMode: 'VIDEO',
+        numHands: 1
+      });
+    }
+
+    function showError(msg) {
+      loadError.textContent = msg || 'Load failed';
+      startBtn.disabled = false;
+      startBtn.textContent = 'Retry';
+    }
+
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      loadError.textContent = '';
+      startBtn.textContent = 'Connecting camera…';
+      try {
+        const videoOpts = isMobile
+          ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+          : { width: 640, height: 480 };
+        const stream = await navigator.mediaDevices.getUserMedia({ video: videoOpts });
+        video.srcObject = stream;
+        await video.play();
+      } catch (e) {
+        showError('Camera error: ' + (e.message || 'Please allow camera access'));
+        return;
+      }
+      startBtn.textContent = 'Loading gesture model…';
+      try {
+        await initHands();
+        resize();
+        window.addEventListener('resize', resize);
+        setMode(MODE_PLAY);
+        startScreen.classList.add('hidden');
+        camWrap.style.display = 'block';
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start camera';
+        tick.last = performance.now();
+        animationId = requestAnimationFrame(tick);
+      } catch (e) {
+        console.error(e);
+        showError('Model load failed: ' + (e.message || String(e)));
+      }
+    });
+  </script>
+</body>
+</html>

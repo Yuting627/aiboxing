@@ -118,6 +118,7 @@
     .reveal.reveal-home { transition-delay: 0.6s; }
     .reveal.reveal-about { transition-delay: 0.85s; }
     .reveal.reveal-boxing { transition-delay: 1.05s; }
+    .reveal.reveal-rain { transition-delay: 1.25s; }
 
     /* 导航 — 页面上方 */
     .nav {
@@ -411,6 +412,29 @@
     .boxing-intro-overlay-inner.shrinking { border-radius: 50%; }
     .boxing-intro-overlay-inner video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+    /* Rain section — Now You See Me */
+    #rain .section-inner { display: flex; justify-content: center; align-items: center; min-height: 50vh; }
+    .rain-card {
+      padding: 2rem 2.5rem; border-radius: var(--radius-card); max-width: 520px; text-align: center;
+      background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+    .rain-card::before {
+      content: ''; position: absolute; inset: -2px; z-index: -1; border-radius: calc(var(--radius-card) + 2px);
+      background: linear-gradient(135deg, rgba(160, 240, 105, 0.25), transparent 50%, rgba(160, 240, 105, 0.1)); opacity: 0; transition: opacity 0.35s ease;
+    }
+    .rain-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.28), 0 0 0 1px rgba(160, 240, 105, 0.2), 0 0 40px rgba(160, 240, 105, 0.1); }
+    .rain-card:hover::before { opacity: 1; }
+    .rain-title { font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: clamp(1.25rem, 3vw, 1.75rem); color: #fff; margin-bottom: 0.75rem; letter-spacing: 0.12em; }
+    .rain-desc { color: var(--muted-alpha); font-size: 0.9375rem; margin-bottom: 1.5rem; line-height: 1.6; }
+    .rain-enter-btn {
+      display: inline-block; padding: 0.75rem 1.75rem; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--glow-hex); background: rgba(160, 240, 105, 0.12); border: 1px solid rgba(160, 240, 105, 0.4);
+      border-radius: var(--radius); text-decoration: none; transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+    .rain-enter-btn:hover { background: rgba(160, 240, 105, 0.2); box-shadow: 0 0 24px rgba(160, 240, 105, 0.25); transform: scale(1.02); }
+
     /* Modal */
     .modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 2rem; }
     .modal.active { display: flex; }
@@ -425,17 +449,21 @@
     .modal-content { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: var(--radius); box-shadow: 0 0 60px rgba(0,0,0,0.5); }
 
     /* 手机端 */
-    .nav-toggle { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: hsl(var(--foreground)); cursor: pointer; border-radius: var(--radius); }
-    .nav-toggle span { display: block; width: 20px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.2s, opacity 0.2s; }
+    .nav-menu-btn { display: none; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border: 1px solid var(--glass-border); background: var(--glass); color: hsl(var(--foreground)); cursor: pointer; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; }
+    .nav-menu-btn:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 0 1px rgba(160, 240, 105, 0.25); }
+    .nav-toggle { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: none; background: transparent; color: inherit; cursor: pointer; border-radius: var(--radius); flex-shrink: 0; }
+    .nav-toggle span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.2s, opacity 0.2s; }
     .nav-toggle span + span { margin-top: 5px; }
     .nav.open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
     .nav.open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     .nav-toggle { display: none; }
+    .nav-menu-btn .nav-toggle { display: flex; flex-direction: column; }
 
     @media (max-width: 768px) {
       .nav { padding: 0.5rem 1rem; height: var(--nav-height); }
+      .nav-menu-btn { display: flex; }
       .nav-toggle { display: flex; flex-direction: column; }
       .nav-menu {
         position: absolute;
@@ -707,6 +735,11 @@
       {
         "id": "boxing",
         "label": "AI BOXING"
+      },
+      {
+        "id": "rain",
+        "label": "RAIN CONTROL",
+        "url": "rain.html"
       }
     ]
   },
@@ -771,7 +804,10 @@
   <nav class="nav reveal reveal-nav" id="nav">
     <div class="nav-inner">
       <a href="#" class="nav-brand" id="nav-brand">Yuting's Life</a>
-      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+      <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="打开菜单" aria-expanded="false">
+        <span class="nav-toggle" id="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="nav-menu-btn-text">菜单</span>
+      </button>
       <div class="nav-menu" id="nav-menu"></div>
     </div>
   </nav>
@@ -819,12 +855,22 @@
       </div>
     </div>
   </section>
+  <section id="rain" class="reveal reveal-rain">
+    <div class="section-inner">
+      <div class="card float-card rain-card" style="animation-delay: 0.2s;">
+        <h2 class="rain-title">NOW YOU SEE ME</h2>
+        <p class="rain-desc">Gesture-controlled rain. Use your hand: open palm to play, fist to pause, pinch for slow-mo, palm forward to freeze.</p>
+        <a href="rain.html" class="rain-enter-btn">Enter experience</a>
+      </div>
+    </div>
+  </section>
   <div class="modal" id="media-modal">
     <button type="button" class="modal-close" id="modal-close" aria-label="关闭">&times;</button>
     <div id="modal-content-wrap"></div>
   </div>
   <script>
     var CONFIG_URL = '../source/config.json';
+    var SITE_JSON_URL = '../source/contents/site.json';
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.body.classList.add('intro-done');
     } else {
@@ -882,7 +928,8 @@
       var menuEl = document.getElementById('nav-menu');
       if (brand && site.siteTitle) { brand.innerHTML = titleWithAccent(site.siteTitle); var firstId = site.menu && site.menu[0] ? site.menu[0].id : 'home'; brand.href = '#' + firstId; }
       if (menuEl && site.menu && Array.isArray(site.menu)) {
-        menuEl.innerHTML = site.menu.map(function(m, i) { return '<a href="#' + (m.id || '') + '" class="' + (i === 0 ? 'active' : '') + '">' + (m.label || m.id || '') + '</a>'; }).join('');
+        var base = (window.location.pathname || '').indexOf('pages') >= 0 ? '' : 'pages/';
+        menuEl.innerHTML = site.menu.map(function(m, i) { var href = m.url ? (base + m.url) : ('#' + (m.id || '')); return '<a href="' + href + '" class="' + (i === 0 && !m.url ? 'active' : '') + '">' + (m.label || m.id || '') + '</a>'; }).join('');
       }
     }
     function setHome(data, config) {
@@ -1021,15 +1068,18 @@
     window.addEventListener('scroll', function() { updateActiveNav(); var nav = document.getElementById('nav'); if (nav) nav.classList.toggle('scrolled', window.scrollY > 60); });
     (function navMobile() {
       var nav = document.getElementById('nav');
-      var toggle = document.getElementById('nav-toggle');
+      var menuBtn = document.getElementById('nav-menu-btn');
       var menu = document.getElementById('nav-menu');
-      if (!toggle || !menu) return;
-      function closeMenu() { nav.classList.remove('open'); document.body.classList.remove('nav-menu-open'); }
-      toggle.addEventListener('click', function() { nav.classList.toggle('open'); document.body.classList.toggle('nav-menu-open', nav.classList.contains('open')); });
+      if (!menuBtn || !menu) return;
+      function closeMenu() { nav.classList.remove('open'); document.body.classList.remove('nav-menu-open'); if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false'); }
+      function openMenu() { nav.classList.add('open'); document.body.classList.add('nav-menu-open'); menuBtn.setAttribute('aria-expanded', 'true'); }
+      menuBtn.addEventListener('click', function() {
+        if (nav.classList.contains('open')) closeMenu(); else { openMenu(); }
+      });
       menu.addEventListener('click', function(e) { if (e.target.closest('a')) closeMenu(); });
       document.addEventListener('click', function(e) { if (nav.classList.contains('open') && !nav.contains(e.target)) closeMenu(); });
     })();
-        (function init() {
+            (function init() {
       var el = document.getElementById('page-data');
       if (!el) return;
       var data = JSON.parse(el.textContent);
@@ -1040,23 +1090,11 @@
       paths.videos = config.paths.videos || '';
       paths.contents = config.paths.contents || '';
       var site = data.site, home = data.home, about = data.about, skills = data.skills, boxing = data.boxing;
-      var globalBg = getPageAsset(config, 'boxing', 'backgroundImage');
-      if (globalBg) {
-        var pageBgEl = document.getElementById('page-bg');
-        if (pageBgEl) pageBgEl.style.backgroundImage = 'url(' + globalBg + ')';
-      }
       if (site) setNav(site);
       setHome(home, config);
       setAbout(about, config);
       setSkills(skills);
       setBoxing(boxing, config);
-      var navMenu = document.getElementById('nav-menu');
-      if (navMenu) navMenu.addEventListener('click', function(e) {
-        var a = e.target.closest('a');
-        if (a && a.getAttribute('href') === '#boxing' && typeof window.__boxingStartIntro === 'function') {
-          setTimeout(window.__boxingStartIntro, 100);
-        }
-      });
       updateActiveNav();
     })();
   </script>
