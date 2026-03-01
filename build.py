@@ -135,6 +135,11 @@ SYNC_INIT_JS = r"""    (function init() {
       paths.videos = config.paths.videos || '';
       paths.contents = config.paths.contents || '';
       var site = data.site, home = data.home, about = data.about, skills = data.skills, boxing = data.boxing;
+      var bgUrl = getPageAsset(config, 'boxing', 'backgroundImage');
+      if (bgUrl) {
+        var pageBgEl = document.getElementById('page-bg');
+        if (pageBgEl) pageBgEl.style.backgroundImage = 'url(' + bgUrl + ')';
+      }
       if (site) setNav(site);
       setHome(home, config);
       setAbout(about, config);
