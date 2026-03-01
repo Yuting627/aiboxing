@@ -10,3 +10,5 @@ alwaysApply: true
   - icons/        页面 icon（联系方式、技能图标）
   - videos/       页面视频
   - contents/     页面文字与配置（JSON）
+要求
+- 每次前端效果改动在template，并且要求整体风格统一，不随便改动历史的组件和效果
