@@ -709,7 +709,7 @@
     <div class="section-inner">
       <div class="boxing-header">
         <div class="boxing-avatar-wrap" id="boxing-avatar-wrap">
-          <video class="boxing-avatar-video" id="boxing-avatar-video" muted playsinline loop></video>
+          <video class="boxing-avatar-video" id="boxing-avatar-video" muted playsinline webkit-playsinline loop preload="auto"></video>
           <img class="boxing-avatar" id="boxing-avatar" src="" alt="Boxing" />
         </div>
         <div class="boxing-intro-card">
@@ -721,7 +721,7 @@
     </div>
     <div class="boxing-intro-overlay" id="boxing-intro-overlay">
       <div class="boxing-intro-overlay-inner" id="boxing-intro-overlay-inner">
-        <video id="boxing-intro-overlay-video" muted playsinline></video>
+        <video id="boxing-intro-overlay-video" muted playsinline webkit-playsinline></video>
       </div>
     </div>
   </section>
@@ -920,6 +920,10 @@
       var overlayVideo = document.getElementById('boxing-intro-overlay-video');
       var introVideoName = config && config.pages && config.pages.boxing && config.pages.boxing.introVideo;
       var introVideoUrl = introVideoName ? resolveAsset(pathJoin(paths.videos, introVideoName)) : '';
+      var introPoster = videoPosterUrl(introVideoName);
+      if (overlayVideo && introPoster) overlayVideo.poster = introPoster;
+      var avatarVideo = document.getElementById('boxing-avatar-video');
+      if (avatarVideo && introPoster) avatarVideo.poster = introPoster;
       function startIntroPlay() {
         if (!overlay || !overlayInner || !overlayVideo || !introVideoUrl) return;
         overlayInner.removeAttribute('style');
@@ -949,7 +953,6 @@
         }, { once: true });
       }
       if (overlayVideo) overlayVideo.onended = onIntroEnded;
-      var avatarVideo = document.getElementById('boxing-avatar-video');
       if (wrap && introVideoUrl) {
         wrap.addEventListener('mouseenter', function() {
           if (overlay.classList.contains('visible')) return;
