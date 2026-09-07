@@ -674,7 +674,7 @@
   </div>
   <section id="home" class="reveal reveal-home">
     <div class="home-media">
-      <video id="home-bg-video" class="home-bg-video" muted playsinline preload="auto"></video>
+      <video id="home-bg-video" class="home-bg-video" muted playsinline webkit-playsinline preload="auto"></video>
       <div class="home-video-fade" id="home-video-fade" aria-hidden="true"></div>
     </div>
     <div class="home-content">
@@ -748,24 +748,40 @@
       if (!base || !filename) return '';
       return base.replace(/\/$/, '') + '/' + filename;
     }
+    function pageBase() {
+      var p = location.pathname || '/';
+      if (p.endsWith('/')) return p;
+      var last = p.split('/').pop() || '';
+      if (/\.[a-zA-Z0-9]+$/.test(last)) return p.slice(0, p.lastIndexOf('/') + 1) || '/';
+      return p + '/';
+    }
+    function resolveAsset(rel) {
+      if (!rel) return '';
+      if (/^(https?:|data:|blob:|\/)/i.test(rel)) return rel;
+      return pageBase() + rel.replace(/^\.\//, '');
+    }
+    function videoPosterUrl(filename) {
+      if (!filename) return '';
+      return resolveAsset(pathJoin(paths.videos, filename.replace(/\.[^.]+$/, '') + '.jpg'));
+    }
     function getPageAsset(config, pageId, key) {
       if (!config || !config.pages || !config.pages[pageId]) return '';
       var name = config.pages[pageId][key];
       if (!name) return '';
-      return pathJoin(paths.pics, name);
+      return resolveAsset(pathJoin(paths.pics, name));
     }
     function getPageVideo(config, pageId, key) {
       if (!config || !config.pages || !config.pages[pageId]) return '';
       var name = config.pages[pageId][key];
       if (!name) return '';
-      return pathJoin(paths.videos, name);
+      return resolveAsset(pathJoin(paths.videos, name));
     }
     function getPageMediaList(config, pageId) {
       if (!config || !config.pages || !config.pages[pageId] || !config.pages[pageId].media) return [];
       if (!paths.pics || !paths.videos) return [];
       return config.pages[pageId].media.map(function(item) {
-        var src = item.type === 'video' ? pathJoin(paths.videos, item.src) : pathJoin(paths.pics, item.src);
-        var thumb = item.type === 'video' ? pathJoin(paths.videos, item.thumb || item.src) : pathJoin(paths.pics, item.thumb || item.src);
+        var src = item.type === 'video' ? resolveAsset(pathJoin(paths.videos, item.src)) : resolveAsset(pathJoin(paths.pics, item.src));
+        var thumb = item.type === 'video' ? resolveAsset(pathJoin(paths.videos, item.thumb || item.src)) : resolveAsset(pathJoin(paths.pics, item.thumb || item.src));
         return { type: item.type, src: src, thumb: thumb };
       });
     }
@@ -849,8 +865,10 @@
       if (titleEl) titleEl.innerHTML = titleWithAccent(data.title || 'YUTING FENG');
       if (subEl) subEl.textContent = data.subtitle || 'Data Science & Project Management';
       var videoEl = document.getElementById('home-bg-video');
+      var videoName = config && config.pages && config.pages.home && config.pages.home.backgroundVideo;
       var videoUrl = config ? getPageVideo(config, 'home', 'backgroundVideo') : '';
       if (videoEl && videoUrl) {
+        videoEl.poster = videoPosterUrl(videoName);
         videoEl.src = videoUrl;
         videoEl.load();
         initVideoScrub(videoEl);
@@ -873,8 +891,10 @@
       var intro = (data.intro || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       introEl.innerHTML = intro.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
       var videoEl = document.getElementById('about-photo');
+      var videoName = config && config.pages && config.pages.about && config.pages.about.video;
       var videoUrl = config ? getPageVideo(config, 'about', 'video') : '';
       if (videoEl && videoUrl) {
+        videoEl.poster = videoPosterUrl(videoName);
         videoEl.src = videoUrl;
         videoEl.load();
         initVideoHoverPlay(videoEl);
@@ -899,7 +919,7 @@
       var overlayInner = document.getElementById('boxing-intro-overlay-inner');
       var overlayVideo = document.getElementById('boxing-intro-overlay-video');
       var introVideoName = config && config.pages && config.pages.boxing && config.pages.boxing.introVideo;
-      var introVideoUrl = introVideoName && paths.videos ? pathJoin(paths.videos, introVideoName) : '';
+      var introVideoUrl = introVideoName ? resolveAsset(pathJoin(paths.videos, introVideoName)) : '';
       function startIntroPlay() {
         if (!overlay || !overlayInner || !overlayVideo || !introVideoUrl) return;
         overlayInner.removeAttribute('style');
