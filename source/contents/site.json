@@ -3,7 +3,7 @@
   "menu": [
     { "id": "home", "label": "HOME" },
     { "id": "about", "label": "ABOUT" },
-    { "id": "boxing", "label": "AI BOXING" },
-    { "id": "rain", "label": "RAIN CONTROL" ,"url": "pages/rain.html"}
+    { "id": "boxing", "label": "AI BOXING" }
   ]
 }
+
