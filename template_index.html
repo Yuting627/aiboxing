@@ -492,22 +492,43 @@
       height: 100%;
       max-width: min(50%, 36rem);
       pointer-events: auto;
+      gap: var(--screen-gap);
     }
     .about-me {
       flex: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
       padding-right: 0;
     }
     .about-me .about-title { font-family: var(--title-font); font-weight: 600; font-size: var(--screen-title); letter-spacing: 0.1em; color: #111; margin-bottom: 0.5rem; text-shadow: none; }
-    .about-me .about-intro-text { color: hsl(var(--muted-foreground)); font-size: var(--screen-body); max-width: none; width: 100%; white-space: pre-line; line-height: 1.5; margin-bottom: clamp(0.9em, 2.4vh, 3.3em); }
+    .about-me .about-intro-text {
+      color: hsl(var(--muted-foreground));
+      font-size: var(--screen-body);
+      max-width: none;
+      width: 100%;
+      white-space: pre-line;
+      line-height: 1.5;
+      margin: 0;
+    }
     .skills-card {
       flex: 2;
       min-height: 0;
       display: flex;
       flex-direction: column;
+      justify-content: center;
     }
     .skills-card .card-header { padding: clamp(0.7rem, 1.5vh, 1.25rem) 1.5rem 0.4rem; }
     .skills-card .card-title { font-size: var(--screen-heading); letter-spacing: 0.08em; margin-bottom: 0.4rem; }
-    .skills-card .card-content { padding: 0.35rem 1.5rem clamp(0.7rem, 1.4vh, 1.25rem); flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 0.4rem; }
+    .skills-card .card-content {
+      padding: 0.35rem 1.5rem clamp(0.7rem, 1.4vh, 1.25rem);
+      flex: 0 1 auto;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
     .skills-card .skills-desc { margin: 0 0 0.4rem; font-size: var(--screen-body); max-width: none; color: hsl(var(--muted-foreground)); line-height: 1.5; }
     .skills-card .skills-icons { gap: 0.75rem; justify-content: flex-start; }
     .skills-card .skills-icons img { width: clamp(28px, 3.6vh, 40px); height: clamp(28px, 3.6vh, 40px); }
@@ -516,9 +537,39 @@
       width: 100%;
       height: 100%;
     }
-    #experience .section-inner { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+    #experience { align-items: stretch; }
+    #experience .section-inner {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
     .experience-title { font-family: var(--title-font); font-weight: 600; font-size: var(--screen-title); letter-spacing: 0.1em; color: #111; margin-bottom: var(--screen-gap); text-shadow: none; }
-    .experience-list { list-style: none; display: flex; flex-direction: column; justify-content: space-between; flex: 1; min-height: 0; gap: var(--screen-gap); margin: 0; padding: 0; }
+    .experience-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+      min-height: 0;
+      gap: var(--screen-gap);
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    .experience-list::before {
+      content: '';
+      position: absolute;
+      left: calc(9.5rem + 1.25rem + 1rem);
+      top: calc(0.95rem + 7px);
+      bottom: calc(0.95rem + 7px);
+      width: 1px;
+      background: rgba(17, 17, 17, 0.18);
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 0;
+    }
     .experience-item {
       display: grid;
       grid-template-columns: 9.5rem 2rem 1fr;
@@ -542,17 +593,7 @@
       display: flex;
       justify-content: center;
     }
-    .experience-axis::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: calc(var(--screen-gap) * -1);
-      left: 50%;
-      width: 1px;
-      background: rgba(17, 17, 17, 0.18);
-      transform: translateX(-50%);
-    }
-    .experience-item:last-child .experience-axis::before { bottom: auto; height: 1.45rem; }
+    .experience-axis::before { display: none; }
     .experience-dot {
       position: relative;
       z-index: 1;
@@ -575,12 +616,12 @@
     }
     .experience-card { padding: clamp(0.55rem, 1.3vh, 1.25rem) clamp(0.9rem, 1.6vw, 1.5rem); }
     .experience-card .experience-role {
-      font-family: var(--font-heading);
+      font-family: var(--font-body);
       font-size: var(--screen-heading);
-      font-weight: 500;
+      font-weight: 600;
       color: #111;
       margin-bottom: 0.3rem;
-      letter-spacing: 0.01em;
+      letter-spacing: 0;
     }
     .experience-card .experience-summary {
       color: hsl(var(--muted-foreground));
@@ -634,17 +675,20 @@
       color: #111;
     }
     .project-card-title {
-      font-family: var(--font-heading);
+      font-family: var(--font-body);
       font-size: 1.35rem;
-      font-weight: 500;
+      font-weight: 600;
       color: #111;
       margin: 0 0 0.5rem;
-      letter-spacing: 0.01em;
+      letter-spacing: 0;
     }
     .project-card-summary {
+      font-family: var(--font-body);
       font-size: 0.88rem;
+      font-weight: 400;
+      letter-spacing: 0;
       line-height: 1.55;
-      color: #111;
+      color: hsl(var(--muted-foreground));
       margin: 0 0 1.15rem;
     }
     .project-card-btn {
@@ -915,6 +959,11 @@
       .about-media { left: 50%; right: 0; width: 50%; }
       .experience-title { margin-bottom: 0.7rem; text-align: left; }
       .experience-list { gap: 0.65rem; }
+      .experience-list::before {
+        left: 1rem;
+        top: calc(0.2rem + 7px);
+        bottom: calc(0.2rem + 7px);
+      }
       .experience-item { grid-template-columns: 1.25rem 1fr; column-gap: 0.85rem; }
       .experience-period {
         grid-column: 2;
@@ -924,8 +973,6 @@
         white-space: normal;
       }
       .experience-axis { grid-column: 1; grid-row: 1 / span 2; }
-      .experience-axis::before { bottom: -1.25rem; }
-      .experience-item:last-child .experience-axis::before { height: 0.85rem; }
       .experience-dot { margin-top: 0.2rem; }
       .experience-card { grid-column: 2; grid-row: 2; padding: 1rem 1.25rem; }
       .projects-title { margin-bottom: 1.75rem; text-align: left; }
