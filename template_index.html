@@ -158,12 +158,13 @@
     .reveal.reveal-home { transition-delay: 0.6s; }
     .reveal.reveal-about { transition-delay: 0.85s; }
     .reveal.reveal-experience { transition-delay: 1.05s; }
-    .reveal.reveal-boxing { transition-delay: 1.25s; }
+    .reveal.reveal-projects { transition-delay: 1.15s; }
+    .reveal.reveal-boxing { transition-delay: 1.35s; }
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
-    #nav, #home, #about, #experience, #boxing { font-family: var(--font-body); color: #111; }
+    #nav, #home, #about, #experience, #projects, #boxing { font-family: var(--font-body); color: #111; }
     .nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 10;
       padding: 1rem 1.25rem;
@@ -183,25 +184,12 @@
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom-color: rgba(255, 255, 255, 0.5);
     }
-    .nav-inner { width: 100%; position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; }
+    .nav-inner { width: 100%; position: relative; z-index: 2; display: flex; align-items: center; justify-content: flex-end; }
     @media (min-width: 768px) {
       .nav-inner { display: grid; grid-template-columns: 1fr auto 1fr; }
-      .nav-logo { justify-self: start; }
-      .nav-cta { justify-self: end; }
+      .nav-menu { justify-self: center; grid-column: 2; }
+      .nav-cta { justify-self: end; grid-column: 3; }
     }
-    .nav-logo { display: flex; align-items: center; gap: 0.75rem; }
-    .nav-brand {
-      color: #000;
-      text-decoration: none;
-      font-family: var(--font-heading);
-      font-size: 21px;
-      letter-spacing: -0.025em;
-      text-shadow: none;
-    }
-    @media (min-width: 640px) { .nav-brand { font-size: 26px; } }
-    .nav-brand:hover { color: #000; opacity: 0.6; }
-    .nav-asterisk { font-size: 25px; color: #000; user-select: none; letter-spacing: -0.02em; line-height: 1; }
-    @media (min-width: 640px) { .nav-asterisk { font-size: 30px; } }
     .nav-menu {
       display: none;
       position: static;
@@ -209,15 +197,17 @@
       transform: none;
       flex-direction: row;
       align-items: center;
-      justify-self: center;
-      font-size: 23px;
+      font-family: var(--font-body);
+      font-size: 20px;
       color: #000;
       white-space: nowrap;
+      gap: 2ch;
     }
     .nav-menu a {
-      color: #000;
+      color: #888;
       text-decoration: none;
-      font-size: 23px;
+      font-family: var(--font-body);
+      font-size: 20px;
       font-weight: 400;
       letter-spacing: 0;
       text-transform: none;
@@ -226,21 +216,25 @@
       background: none;
       backdrop-filter: none;
       border-radius: 0;
-      transition: opacity 0.2s ease;
+      transition: color 0.2s ease, font-family 0.2s ease, letter-spacing 0.2s ease;
     }
-    .nav-menu a:hover, .nav-menu a.active {
-      color: #000;
-      opacity: 0.6;
+    .nav-menu a:hover {
+      color: #555;
       background: none;
       border: none;
       transform: none;
       box-shadow: none;
     }
-    .nav-sep { color: #000; font-size: 23px; }
+    .nav-menu a.active {
+      color: #111;
+      font-family: var(--title-font);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
     .nav-cta {
       display: none;
       color: #000;
-      font-size: 23px;
+      font-size: 20px;
       text-decoration: underline;
       text-underline-offset: 2px;
       transition: opacity 0.2s ease;
@@ -270,14 +264,21 @@
     .nav-overlay.is-open { opacity: 1; pointer-events: auto; }
     .nav-overlay-menu { display: flex; flex-direction: column; align-items: flex-start; gap: 2rem; }
     .nav-overlay-menu a {
-      color: #000;
+      color: #888;
       text-decoration: none;
+      font-family: var(--font-body);
       font-size: 32px;
-      font-weight: 500;
-      transition: opacity 0.2s ease;
+      font-weight: 400;
+      transition: color 0.2s ease;
     }
-    .nav-overlay-menu a:hover { opacity: 0.6; }
-    .nav-overlay-cta { text-decoration: underline !important; text-underline-offset: 2px; }
+    .nav-overlay-menu a:hover { color: #555; }
+    .nav-overlay-menu a.active {
+      color: #111;
+      font-family: var(--title-font);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+    .nav-overlay-cta { color: #111 !important; text-decoration: underline !important; text-underline-offset: 2px; }
     @media (min-width: 768px) {
       .nav-overlay { display: none !important; }
     }
@@ -410,26 +411,55 @@
     .home-pill-outline:hover { background: #111; color: #fff; }
     .home-pill-outline u { text-underline-offset: 1px; }
     .home-copy-icon { width: 12px; height: 12px; flex-shrink: 0; }
-    #about, #experience, #boxing { background: #fff; }
-    /* 左右两列等高：grid stretch + 左列 flex 分栏 */
-    #about .section-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--gap);
+    #about, #experience, #projects, #boxing { background: #fff; }
+    #about {
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
       align-items: stretch;
-      min-height: min(70vh, 560px);
+      --nav-clearance: 5.25rem;
+    }
+    #about .section-inner {
+      position: relative;
+      z-index: 10;
+      display: block;
+      width: 100%;
+      min-height: 100%;
+      pointer-events: none;
+    }
+    .about-media {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 50%;
+      z-index: 1;
+      width: 50%;
+      height: auto;
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-start;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+    #about-pixel-swap {
+      position: relative;
+      width: 100%;
+      height: 100%;
     }
     .about-left-col {
       display: flex;
       flex-direction: column;
       min-height: 0;
+      max-width: min(50%, 36rem);
+      pointer-events: auto;
     }
     .about-me {
       flex: 3;
       padding-right: 0.5rem;
     }
     .about-me .about-title { font-family: var(--title-font); font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: 0.1em; color: #111; margin-bottom: 0.5rem; text-shadow: none; }
-    .about-me .about-intro-text { color: hsl(var(--muted-foreground)); font-size: 0.95rem; max-width: 42ch; white-space: pre-line; line-height: 1.65; }
+    .about-me .about-intro-text { color: hsl(var(--muted-foreground)); font-size: 0.95rem; max-width: 42ch; white-space: pre-line; line-height: 1.65; margin-bottom: calc(1.65em * 2); }
     .skills-card {
       flex: 2;
       min-height: 0;
@@ -442,18 +472,10 @@
     .skills-card .skills-desc { margin: 0 0 0.5rem; font-size: 0.95rem; max-width: none; color: hsl(var(--muted-foreground)); }
     .skills-card .skills-icons { gap: 1rem; justify-content: flex-start; }
     .skills-card .skills-icons img { width: 40px; height: 40px; }
-    .about-right-col {
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      min-height: 0;
-    }
-    #about { overflow: visible; }
     .about-lanyard {
       position: relative;
       width: 100%;
       height: 100%;
-      min-height: min(78vh, 640px);
     }
     .experience-title { font-family: var(--title-font); font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: 0.1em; color: #111; margin-bottom: 2.5rem; text-shadow: none; }
     .experience-list { list-style: none; display: flex; flex-direction: column; gap: 1.75rem; margin: 0; padding: 0; }
@@ -525,6 +547,85 @@
       font-size: 0.95rem;
       line-height: 1.65;
       margin: 0;
+    }
+    #projects { background: #fff; }
+    .projects-title { font-family: var(--title-font); font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: 0.1em; color: #111; margin-bottom: 2.5rem; text-shadow: none; }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.75rem;
+    }
+    .project-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border: none;
+      border-radius: 28px;
+      overflow: visible;
+      padding: 12px 12px 1.15rem;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 12px 32px rgba(17, 17, 17, 0.08);
+      transition: transform var(--transition), box-shadow var(--transition-slow);
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(17, 17, 17, 0.12);
+    }
+    .project-card-cover {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 20px;
+      background: #f3f3f3;
+      box-shadow: 0 8px 22px rgba(17, 17, 17, 0.16);
+      transition: transform 0.6s ease, box-shadow 0.3s ease;
+    }
+    .project-card:hover .project-card-cover { transform: none; }
+    .project-card-body {
+      position: relative;
+      z-index: 1;
+      padding: 1.15rem 0.65rem 0.15rem;
+      background: transparent;
+      color: #111;
+    }
+    .project-card-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: #111;
+      margin: 0 0 0.5rem;
+      letter-spacing: 0.01em;
+    }
+    .project-card-summary {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #111;
+      margin: 0 0 1.15rem;
+    }
+    .project-card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      border: 1px solid rgba(17, 17, 17, 0.08);
+      border-radius: 9999px;
+      background: #fff;
+      color: #111;
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.7em 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 17, 17, 0.08);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .project-card-btn:hover {
+      background: #f7f7f7;
+      box-shadow: 0 6px 16px rgba(17, 17, 17, 0.12);
     }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
     #boxing { background: #fff; }
@@ -639,6 +740,80 @@
     }
     .modal-close:hover { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
     .modal-content { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: var(--radius); }
+    .project-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 210;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      background: rgba(8, 8, 8, 0.94);
+      padding: 4.5rem 0 3.5rem;
+    }
+    .project-modal.active { display: flex; }
+    body.project-modal-open { overflow: hidden; }
+    .project-modal-stage {
+      width: 66.666vw;
+      height: calc(100vh - 8rem);
+      overflow: hidden;
+      position: relative;
+    }
+    .project-modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s ease;
+    }
+    .project-modal-close:hover { background: rgba(255, 255, 255, 0.24); }
+    .project-modal-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      object-fit: unset;
+      border-radius: 8px;
+      will-change: transform;
+    }
+    .project-modal-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 2rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s ease;
+    }
+    .project-modal-nav:hover { background: rgba(255, 255, 255, 0.24); }
+    .project-modal-prev { left: 1.25rem; }
+    .project-modal-next { right: 1.25rem; }
+    .project-modal-nav.is-hidden { display: none; }
+    .project-modal-counter {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+    }
 
     /* 手机端适配 */
     .nav-toggle {
@@ -679,13 +854,13 @@
       }
       .home-title { font-size: clamp(2.6rem, 11vw, 4.4rem); letter-spacing: 0.05em; }
       .home-subtitle { font-size: 0.8rem; margin-top: 1.35em; margin-bottom: 1.5rem; }
-      #about .section-inner { grid-template-columns: 1fr; gap: 1.5rem; min-height: auto; text-align: center; }
-      #about .about-left-col { order: 1; }
+      #about { min-height: 100vh; --nav-clearance: 4.75rem; }
+      #about .section-inner { min-height: 100%; text-align: center; }
+      #about .about-left-col { max-width: 50%; }
       #about .about-me { text-align: center; padding-right: 0; }
       #about .about-me .about-intro-text { max-width: none; margin: 0 auto; }
       #about .skills-card .skills-icons { justify-content: center; }
-      #about .about-right-col { order: 2; }
-      .about-lanyard { min-height: 380px; }
+      .about-media { left: 50%; right: 0; width: 50%; }
       .experience-title { margin-bottom: 1.75rem; text-align: left; }
       .experience-list { gap: 1.25rem; }
       .experience-item { grid-template-columns: 1.25rem 1fr; column-gap: 0.85rem; }
@@ -701,6 +876,8 @@
       .experience-item:last-child .experience-axis::before { height: 0.85rem; }
       .experience-dot { margin-top: 0.2rem; }
       .experience-card { grid-column: 2; grid-row: 2; padding: 1rem 1.25rem; }
+      .projects-title { margin-bottom: 1.75rem; text-align: left; }
+      .projects-grid { grid-template-columns: 1fr; gap: 1.25rem; }
       .boxing-header { grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2rem; text-align: center; }
       .boxing-avatar-wrap { width: 120px; height: 120px; margin: 0 auto; }
       .boxing-intro-card { padding: 1rem 1.25rem; }
@@ -711,6 +888,12 @@
       .modal { padding: 1rem; align-items: flex-start; padding-top: 3.5rem; }
       .modal-close { top: 0.75rem; right: 0.75rem; width: 36px; height: 36px; font-size: 1.25rem; }
       .modal-content { max-height: 80vh; }
+      .project-modal { padding: 4rem 0 3.25rem; }
+      .project-modal-stage { width: 66.666vw; height: calc(100vh - 7.25rem); }
+      .project-modal-close { top: 0.75rem; right: 0.75rem; width: 36px; height: 36px; font-size: 1.25rem; }
+      .project-modal-nav { width: 36px; height: 36px; font-size: 1.5rem; }
+      .project-modal-prev { left: 0.5rem; }
+      .project-modal-next { right: 0.5rem; }
     }
     @media (max-width: 480px) {
       .boxing-item { flex: 0 0 140px; width: 140px; }
@@ -733,10 +916,6 @@
   <script type="application/json" id="page-data">{}</script>
   <nav class="nav reveal reveal-nav" id="nav">
     <div class="nav-inner">
-      <div class="nav-logo">
-        <a href="#home" class="nav-brand" id="nav-brand">Yuting's Life</a>
-        <span class="nav-asterisk" aria-hidden="true">✳︎</span>
-      </div>
       <div class="nav-menu" id="nav-menu"></div>
       <a href="#" class="nav-cta" id="nav-cta">Get in touch</a>
       <button type="button" class="nav-toggle" id="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
@@ -759,6 +938,9 @@
     </div>
   </section>
   <section id="about" class="reveal reveal-about">
+    <div class="about-media">
+      <div id="about-pixel-swap" aria-label="Work badge"></div>
+    </div>
     <div class="section-inner">
       <div class="about-left-col">
         <div class="about-me">
@@ -775,15 +957,18 @@
           </div>
         </div>
       </div>
-      <div class="about-right-col">
-        <div class="about-lanyard" id="about-lanyard" aria-label="Work badge"></div>
-      </div>
     </div>
   </section>
   <section id="experience" class="reveal reveal-experience">
     <div class="section-inner">
       <h2 class="experience-title" id="experience-title">Work Experience</h2>
       <ol class="experience-list" id="experience-list"></ol>
+    </div>
+  </section>
+  <section id="projects" class="reveal reveal-projects">
+    <div class="section-inner">
+      <h2 class="projects-title" id="projects-title">My Projects</h2>
+      <div class="projects-grid" id="projects-grid"></div>
     </div>
   </section>
   <section id="boxing" class="reveal reveal-boxing">
@@ -814,6 +999,15 @@
   <div class="modal" id="media-modal">
     <button type="button" class="modal-close" id="modal-close" aria-label="关闭">&times;</button>
     <div id="modal-content-wrap"></div>
+  </div>
+  <div class="project-modal" id="project-modal" role="dialog" aria-modal="true" aria-label="Project gallery">
+    <button type="button" class="project-modal-close" id="project-modal-close" aria-label="关闭">&times;</button>
+    <button type="button" class="project-modal-nav project-modal-prev" id="project-modal-prev" aria-label="上一张">&#8249;</button>
+    <div class="project-modal-stage" id="project-modal-stage">
+      <img class="project-modal-image" id="project-modal-image" alt="" />
+    </div>
+    <button type="button" class="project-modal-nav project-modal-next" id="project-modal-next" aria-label="下一张">&#8250;</button>
+    <div class="project-modal-counter" id="project-modal-counter"></div>
   </div>
   <script>
     var CONFIG_URL = 'source/config.json';
@@ -902,16 +1096,10 @@
     }
     function setNav(site) {
       if (!site) return;
-      var brand = document.getElementById('nav-brand');
       var menuEl = document.getElementById('nav-menu');
       var overlayEl = document.getElementById('nav-overlay-menu');
-      if (brand && site.siteTitle) {
-        brand.textContent = site.siteTitle;
-        var firstId = site.menu && site.menu[0] ? site.menu[0].id : 'home';
-        brand.href = '#' + firstId;
-      }
       if (site.menu && Array.isArray(site.menu)) {
-        if (menuEl) menuEl.innerHTML = site.menu.map(menuLinkHtml).join('<span class="nav-sep">, </span>');
+        if (menuEl) menuEl.innerHTML = site.menu.map(menuLinkHtml).join('');
         if (overlayEl) {
           overlayEl.innerHTML = site.menu.map(menuLinkHtml).join('') +
             '<a href="#" class="nav-overlay-cta" id="nav-overlay-cta">Get in touch</a>';
@@ -992,18 +1180,19 @@
       var introEl = document.getElementById('about-intro');
       var intro = (data.intro || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       introEl.innerHTML = intro.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-      var mount = document.getElementById('about-lanyard');
+      var swap = document.getElementById('about-pixel-swap');
       var photoName = config && config.pages && config.pages.about && config.pages.about.badgePhoto;
       var photoUrl = photoName ? ('source/' + photoName) : 'source/bage_photo.jpg';
-      if (mount && typeof window.mountAboutLanyard === 'function') {
+      var keyboardSrc = getPageAsset(config, 'about', 'backgroundImage') || resolveAsset(pathJoin(paths.pics, 'keyboard.jpg'));
+      if (swap && typeof window.mountAboutPixelSwap === 'function') {
         try {
-          window.mountAboutLanyard(mount, { frontImage: photoUrl });
+          window.mountAboutPixelSwap(swap, { keyboardSrc: keyboardSrc, frontImage: photoUrl });
         } catch (err) {
           console.error(err);
-          mount.innerHTML = '<img class="about-lanyard-fallback" src="' + photoUrl + '" alt="Yuting Feng" />';
+          swap.innerHTML = '<img class="about-keyboard" src="' + keyboardSrc + '" alt="" />';
         }
-      } else if (mount) {
-        mount.innerHTML = '<img class="about-lanyard-fallback" src="' + photoUrl + '" alt="Yuting Feng" />';
+      } else if (swap) {
+        swap.innerHTML = '<img class="about-keyboard" src="' + keyboardSrc + '" alt="" />';
       }
     }
     function setSkills(data) {
@@ -1033,13 +1222,120 @@
         '</li>';
       }).join('');
     }
+    function encodeAsset(rel) {
+      var resolved = resolveAsset(rel);
+      if (!resolved || /^(https?:|data:|blob:)/i.test(resolved)) return resolved;
+      return encodeURI(resolved);
+    }
+    var projectGallery = { images: [], index: 0, panY: 0 };
+    function applyProjectPan() {
+      var img = document.getElementById('project-modal-image');
+      if (img) img.style.transform = 'translateY(' + (projectGallery.panY || 0) + 'px)';
+    }
+    function resetProjectPan() {
+      projectGallery.panY = 0;
+      applyProjectPan();
+    }
+    function clampProjectPan() {
+      var stage = document.getElementById('project-modal-stage');
+      var img = document.getElementById('project-modal-image');
+      if (!stage || !img) return;
+      var extra = img.offsetHeight - stage.clientHeight;
+      var min = extra > 0 ? -extra : 0;
+      projectGallery.panY = Math.min(0, Math.max(min, projectGallery.panY || 0));
+      applyProjectPan();
+    }
+    function renderProjectSlide() {
+      var img = document.getElementById('project-modal-image');
+      var counter = document.getElementById('project-modal-counter');
+      var prev = document.getElementById('project-modal-prev');
+      var next = document.getElementById('project-modal-next');
+      var src = projectGallery.images[projectGallery.index] || '';
+      resetProjectPan();
+      if (img) {
+        img.alt = projectGallery.title || '';
+        if (img.src === src && img.complete) {
+          clampProjectPan();
+        } else {
+          img.onload = function() { clampProjectPan(); };
+          img.src = src;
+        }
+      }
+      if (counter) {
+        counter.textContent = projectGallery.images.length
+          ? (projectGallery.index + 1) + ' / ' + projectGallery.images.length
+          : '';
+      }
+      var hideNav = projectGallery.images.length <= 1;
+      if (prev) prev.classList.toggle('is-hidden', hideNav);
+      if (next) next.classList.toggle('is-hidden', hideNav);
+    }
+    function stepProjectGallery(delta) {
+      var n = projectGallery.images.length;
+      if (!n) return;
+      projectGallery.index = (projectGallery.index + delta + n) % n;
+      renderProjectSlide();
+    }
+    function closeProjectGallery() {
+      var modal = document.getElementById('project-modal');
+      if (modal) modal.classList.remove('active');
+      document.body.classList.remove('project-modal-open');
+      var img = document.getElementById('project-modal-image');
+      if (img) {
+        img.onload = null;
+        img.src = '';
+        img.style.transform = '';
+      }
+      resetProjectPan();
+    }
+    function openProjectGallery(item) {
+      if (!item) return;
+      var images = (item.images || []).map(encodeAsset).filter(Boolean);
+      var cover = encodeAsset(item.cover || '');
+      if (!images.length && cover) images = [cover];
+      if (!images.length) return;
+      var start = cover ? images.indexOf(cover) : 0;
+      projectGallery.images = images;
+      projectGallery.index = start >= 0 ? start : 0;
+      projectGallery.title = item.name || '';
+      renderProjectSlide();
+      var modal = document.getElementById('project-modal');
+      if (modal) modal.classList.add('active');
+      document.body.classList.add('project-modal-open');
+    }
+    function setProjects(data) {
+      var titleEl = document.getElementById('projects-title');
+      var grid = document.getElementById('projects-grid');
+      if (titleEl && data && data.title) titleEl.textContent = data.title;
+      if (!grid) return;
+      var items = (data && data.items) || [];
+      grid.innerHTML = items.map(function(item, i) {
+        var cover = encodeAsset(item.cover || '');
+        return '<article class="project-card" data-index="' + i + '">' +
+          (cover ? '<img class="project-card-cover" src="' + cover + '" alt="' + escapeHtml(item.name || '') + '" />' : '') +
+          '<div class="project-card-body">' +
+            '<h3 class="project-card-title">' + escapeHtml(item.name || '') + '</h3>' +
+            '<p class="project-card-summary">' + escapeHtml(item.summary || '') + '</p>' +
+            '<button type="button" class="project-card-btn">View Detail</button>' +
+          '</div>' +
+        '</article>';
+      }).join('');
+      grid.querySelectorAll('.project-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var idx = parseInt(card.dataset.index, 10);
+          openProjectGallery(items[idx]);
+        });
+      });
+    }
     function setBoxing(data, config) {
       if (!data) return;
       var avatarUrl = config ? getPageAsset(config, 'boxing', 'avatar') : '';
       var avatarImg = document.getElementById('boxing-avatar');
       if (avatarImg) avatarImg.src = avatarUrl || '';
       document.getElementById('boxing-title').innerHTML = titleWithAccent(data.title || 'ALL IN BOXING', 'last');
-      document.getElementById('boxing-intro').textContent = data.intro || '';
+      var boxingIntroEl = document.getElementById('boxing-intro');
+      var boxingIntro = (data.intro || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      boxingIntroEl.innerHTML = boxingIntro.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
       var wrap = document.getElementById('boxing-avatar-wrap');
       var overlay = document.getElementById('boxing-intro-overlay');
       var overlayInner = document.getElementById('boxing-intro-overlay-inner');
@@ -1135,6 +1431,41 @@
     }
     document.getElementById('modal-close').addEventListener('click', function() { var wrap = document.getElementById('modal-content-wrap'); var v = wrap.querySelector('video'); if (v) v.pause(); wrap.innerHTML = ''; document.getElementById('media-modal').classList.remove('active'); });
     document.getElementById('media-modal').addEventListener('click', function(e) { if (e.target.id === 'media-modal') document.getElementById('modal-close').click(); });
+    (function bindProjectModal() {
+      var modal = document.getElementById('project-modal');
+      var closeBtn = document.getElementById('project-modal-close');
+      var prev = document.getElementById('project-modal-prev');
+      var next = document.getElementById('project-modal-next');
+      var image = document.getElementById('project-modal-image');
+      var stage = document.getElementById('project-modal-stage');
+      if (closeBtn) closeBtn.addEventListener('click', closeProjectGallery);
+      if (prev) prev.addEventListener('click', function(e) { e.stopPropagation(); stepProjectGallery(-1); });
+      if (next) next.addEventListener('click', function(e) { e.stopPropagation(); stepProjectGallery(1); });
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal || e.target === stage) closeProjectGallery();
+        });
+        modal.addEventListener('wheel', function(e) {
+          if (!document.body.classList.contains('project-modal-open')) return;
+          e.preventDefault();
+          clampProjectPan();
+          var extra = 0;
+          if (stage && image) extra = image.offsetHeight - stage.clientHeight;
+          if (extra <= 0) return;
+          projectGallery.panY = Math.min(0, Math.max(-extra, (projectGallery.panY || 0) - e.deltaY));
+          applyProjectPan();
+        }, { passive: false });
+      }
+      window.addEventListener('resize', function() {
+        if (document.body.classList.contains('project-modal-open')) clampProjectPan();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (!document.body.classList.contains('project-modal-open')) return;
+        if (e.key === 'Escape') closeProjectGallery();
+        if (e.key === 'ArrowLeft') stepProjectGallery(-1);
+        if (e.key === 'ArrowRight') stepProjectGallery(1);
+      });
+    })();
     function updateActiveNav() {
       var sections = document.querySelectorAll('section[id]');
       var navLinks = document.querySelectorAll('.nav-menu a, .nav-overlay-menu a');
@@ -1278,7 +1609,7 @@
       var skills = await loadJSON(contentsBase + '/skills.json');
       var experience = await loadJSON(contentsBase + '/experience.json');
       var boxing = await loadJSON(contentsBase + '/boxing.json');
-      if (site) setNav(site); setHome(home, config); setAbout(about, config); setSkills(skills); setExperience(experience); setBoxing(boxing, config);
+      if (site) setNav(site); setHome(home, config); setAbout(about, config); setSkills(skills); setExperience(experience); setProjects(); setBoxing(boxing, config);
       var navRoot = document.getElementById('nav');
       var overlayMenu = document.getElementById('nav-overlay');
       function onNavClick(e) {

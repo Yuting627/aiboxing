@@ -1,0 +1,34 @@
+{
+  "title": "My Projects",
+  "items": [
+    {
+      "id": "beauty_dashboard",
+      "name": "DEWU Beauty Dashboard",
+      "type": "data dashboard",
+      "folder": "doc/beauty_dashboard",
+      "cover": "beauty dashboard_overview.png",
+      "summary": "Beauty market command center — GMV, share, price bands, and SKU ranks in one view. Switch to competitor mode and brand mix, share shifts, and ranking tables update together."
+    },
+    {
+      "id": "nike_legal",
+      "name": "Nike Legal Dashboard",
+      "type": "data dashboard",
+      "folder": "doc/nike_legal",
+      "summary": "Nike brand-protection cockpit for digital takedowns, e-commerce mix, and on-the-ground market cleanup. Maps, platform scores, and role-based workflows turn enforcement from scattered files into a live operating system."
+    },
+    {
+      "id": "DEWU_FTW",
+      "name": "DEWU FTW Quarterly Report",
+      "type": "auto-generated report",
+      "folder": "doc/DEWU_FTW_quarterly_report_24SP_20240418",
+      "summary": "A full quarterly resale PPT — cover shots, charts, product grids, and insight tables — generated end to end. Every image, number, and table is assembled by the pipeline. No slide is built by hand."
+    },
+    {
+      "id": "notion_knowledge",
+      "name": "Notion Knowledge Agent",
+      "type": "personal agent",
+      "folder": "doc/notion_knowledge",
+      "summary": "A personal agent wired to my Notion library. It pulls ebooks, writes the summary, drafts notes, and pushes them back to Notion — from bookshelf to structured knowledge in one loop."
+    }
+  ]
+}

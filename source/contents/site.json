@@ -4,6 +4,7 @@
     { "id": "home", "label": "HOME" },
     { "id": "about", "label": "ABOUT" },
     { "id": "experience", "label": "EXPERIENCE" },
+    { "id": "projects", "label": "PROJECTS" },
     { "id": "boxing", "label": "AI BOXING" }
   ]
 }

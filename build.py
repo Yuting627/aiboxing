@@ -18,6 +18,56 @@ VIDEOS_DIR = os.path.join(SOURCE, "videos")
 
 IMAGE_EXT = (".jpg", ".jpeg", ".png", ".gif", ".webp")
 VIDEO_EXT = (".mp4", ".webm", ".mov")
+_NAT_RE = re.compile(r"(\d+)")
+
+
+def natural_key(name: str) -> list:
+    """按文件名中的数字自然排序，使 2 排在 10 前。"""
+    return [int(part) if part.isdigit() else part.lower() for part in _NAT_RE.split(name)]
+
+
+def scan_project_images(folder_rel: str) -> list:
+    """扫描项目文件夹下的图片，返回相对仓库根的路径。"""
+    folder_rel = (folder_rel or "").replace("\\", "/").strip("/")
+    if not folder_rel:
+        return []
+    folder = os.path.join(ROOT, *folder_rel.split("/"))
+    if not os.path.isdir(folder):
+        return []
+    names = []
+    for name in os.listdir(folder):
+        full = os.path.join(folder, name)
+        if name.startswith(".") or os.path.isdir(full):
+            continue
+        if any(name.lower().endswith(ext) for ext in IMAGE_EXT):
+            names.append(name)
+    names.sort(key=natural_key)
+    return [path_join(folder_rel, name) for name in names]
+
+
+def attach_project_media(projects) -> dict:
+    """为 projects.json 的每个项目补上 images 与 cover 相对路径。"""
+    if not isinstance(projects, dict):
+        return {"title": "My Projects", "items": []}
+    items = []
+    for raw in projects.get("items") or []:
+        if not isinstance(raw, dict):
+            continue
+        item = dict(raw)
+        folder = (item.get("folder") or "").replace("\\", "/")
+        images = scan_project_images(folder)
+        cover_name = os.path.basename((item.get("cover") or "").replace("\\", "/"))
+        cover = path_join(folder, cover_name) if cover_name else ""
+        if cover and cover not in images:
+            cover_abs = os.path.join(ROOT, *cover.split("/"))
+            if not os.path.isfile(cover_abs):
+                cover = images[0] if images else ""
+        if not cover:
+            cover = images[0] if images else ""
+        item["images"] = images
+        item["cover"] = cover
+        items.append(item)
+    return {**projects, "items": items}
 
 
 def path_join(base: str, filename: str) -> str:
@@ -36,18 +86,35 @@ def load_json(path: str) -> dict | list | None:
         return None
 
 
+# 其他页面占用的文件，不进入 AI BOXING 滚动画廊
+BOXING_GALLERY_SKIP = {
+    "keyboard.jpg",
+    "start.mp4",
+    "intro.mp4",
+    "intro.jpg",
+    "boxing-avatar.jpg",
+    "boxing-bg.jpg",
+}
+
+
 def scan_media() -> list:
-    """扫描 source/pics 与 source/videos 下所有图片和视频，返回 AI BOXING 媒体列表（仅文件名）。"""
+    """扫描 pics / videos 中实际存在的文件，作为 AI BOXING 画廊（跳过其他页面占用的素材）。"""
     media = []
     if os.path.isdir(PICS_DIR):
         for name in sorted(os.listdir(PICS_DIR)):
-            if name.startswith(".") or os.path.isdir(os.path.join(PICS_DIR, name)):
+            full = os.path.join(PICS_DIR, name)
+            if name.startswith(".") or os.path.isdir(full):
+                continue
+            if name.lower() in BOXING_GALLERY_SKIP:
                 continue
             if any(name.lower().endswith(ext) for ext in IMAGE_EXT):
                 media.append({"type": "image", "src": name, "thumb": name})
     if os.path.isdir(VIDEOS_DIR):
         for name in sorted(os.listdir(VIDEOS_DIR)):
-            if name.startswith(".") or os.path.isdir(os.path.join(VIDEOS_DIR, name)):
+            full = os.path.join(VIDEOS_DIR, name)
+            if name.startswith(".") or os.path.isdir(full):
+                continue
+            if name.lower() in BOXING_GALLERY_SKIP:
                 continue
             if any(name.lower().endswith(ext) for ext in VIDEO_EXT):
                 base = os.path.splitext(name)[0]
@@ -74,6 +141,7 @@ def build_page_data() -> dict:
     skills = load_json(os.path.join(CONTENTS, "skills.json"))
     experience = load_json(os.path.join(CONTENTS, "experience.json"))
     boxing = load_json(os.path.join(CONTENTS, "boxing.json"))
+    projects = attach_project_media(load_json(os.path.join(ROOT, "doc", "projects.json")))
 
     # Skills 已合并到 About 页面，菜单中不再保留 SKILLS 项
     if site and isinstance(site.get("menu"), list):
@@ -102,6 +170,7 @@ def build_page_data() -> dict:
         "skills": skills or {},
         "experience": experience or {},
         "boxing": boxing or {},
+        "projects": projects or {"title": "My Projects", "items": []},
     }
 
 
@@ -136,7 +205,7 @@ SYNC_INIT_JS = r"""    (function init() {
       paths.icons = config.paths.icons || '';
       paths.videos = config.paths.videos || '';
       paths.contents = config.paths.contents || '';
-      var site = data.site, home = data.home, about = data.about, skills = data.skills, experience = data.experience, boxing = data.boxing;
+      var site = data.site, home = data.home, about = data.about, skills = data.skills, experience = data.experience, projects = data.projects, boxing = data.boxing;
       var bgUrl = getPageAsset(config, 'boxing', 'backgroundImage');
       if (bgUrl) {
         var pageBgEl = document.getElementById('page-bg');
@@ -147,6 +216,7 @@ SYNC_INIT_JS = r"""    (function init() {
       setAbout(about, config);
       setSkills(skills);
       setExperience(experience);
+      setProjects(projects);
       setBoxing(boxing, config);
       updateActiveNav();
     })();"""
