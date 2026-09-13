@@ -90,7 +90,7 @@
     .card-title .title-accent { color: #111; text-shadow: none; }
     .card-description { color: hsl(var(--muted-foreground)); font-size: 0.95rem; margin-top: 0.25rem; }
     .card-content { padding: 0.5rem 1.5rem 1.25rem; }
-    .about-intro-text { color: hsl(var(--muted-foreground)); font-size: 0.95rem; max-width: 42ch; white-space: pre-line; line-height: 1.65; }
+    .about-intro-text { color: hsl(var(--muted-foreground)); font-size: 0.95rem; max-width: none; white-space: pre-line; line-height: 1.65; }
     .skills-heading { font-family: var(--title-font); font-weight: 600; font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: 0.12em; color: hsl(var(--foreground)); margin-bottom: 1.5rem; text-shadow: none; text-align: center; }
     .skills-icons { display: flex; flex-wrap: wrap; gap: 1rem; transition: transform var(--transition); }
     .skills-icons img { width: 40px; height: 40px; object-fit: contain; filter: brightness(0); opacity: 0.9; }
@@ -495,10 +495,10 @@
     }
     .about-me {
       flex: 3;
-      padding-right: 0.5rem;
+      padding-right: 0;
     }
     .about-me .about-title { font-family: var(--title-font); font-weight: 600; font-size: var(--screen-title); letter-spacing: 0.1em; color: #111; margin-bottom: 0.5rem; text-shadow: none; }
-    .about-me .about-intro-text { color: hsl(var(--muted-foreground)); font-size: var(--screen-body); max-width: 42ch; white-space: pre-line; line-height: 1.5; margin-bottom: clamp(0.9em, 2.4vh, 3.3em); }
+    .about-me .about-intro-text { color: hsl(var(--muted-foreground)); font-size: var(--screen-body); max-width: none; width: 100%; white-space: pre-line; line-height: 1.5; margin-bottom: clamp(0.9em, 2.4vh, 3.3em); }
     .skills-card {
       flex: 2;
       min-height: 0;
@@ -910,7 +910,7 @@
       #about .section-inner { min-height: 100%; text-align: center; }
       #about .about-left-col { max-width: 50%; }
       #about .about-me { text-align: center; padding-right: 0; }
-      #about .about-me .about-intro-text { max-width: none; margin: 0 auto; }
+      #about .about-me .about-intro-text { max-width: none; width: 100%; margin: 0 auto; }
       #about .skills-card .skills-icons { justify-content: center; }
       .about-media { left: 50%; right: 0; width: 50%; }
       .experience-title { margin-bottom: 0.7rem; text-align: left; }
