@@ -325,6 +325,17 @@
       object-fit: cover;
       object-position: left center;
     }
+    .home-bg-video.is-hidden { display: none; }
+    .home-bg-frames {
+      display: none;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: left center;
+    }
+    .home-bg-frames.is-active { display: block; }
     .home-video-fade {
       display: block;
       position: absolute;
@@ -930,6 +941,7 @@
   <section id="home" class="reveal reveal-home">
     <div class="home-media">
       <video id="home-bg-video" class="home-bg-video" muted playsinline webkit-playsinline preload="auto"></video>
+      <img id="home-bg-frames" class="home-bg-frames" alt="" />
       <div class="home-video-fade" id="home-video-fade" aria-hidden="true"></div>
     </div>
     <div class="section-inner">
@@ -1167,8 +1179,12 @@
         if (mediaEl && poster) mediaEl.style.backgroundImage = 'url(\'' + poster + '\')';
         videoEl.src = videoUrl;
         videoEl.load();
-        initVideoScrub(videoEl);
       }
+      var frameNames = config && config.pages && config.pages.home && config.pages.home.scrubFrames;
+      var frameUrls = (frameNames || []).map(function(name) {
+        return resolveAsset(pathJoin(paths.videos, 'start-frames/' + name));
+      });
+      initHomeScrub(videoEl, frameUrls);
       var contacts = (data.contacts || []).filter(function(c) { return c.label === 'Email'; });
       var email = contacts.length ? contacts[0].value : '';
       setHomeCta(email);
@@ -1502,86 +1518,104 @@
         closeMenu();
       });
     })();
-    function initVideoScrub(video) {
-      if (!video || video.dataset.scrubBound === '1') return;
-      video.dataset.scrubBound = '1';
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = 'auto';
-      var targetTime = 0;
+    function initHomeScrub(video, frameUrls) {
+      frameUrls = frameUrls || [];
+      var frameEl = document.getElementById('home-bg-frames');
       var lastX = window.innerWidth * 0.5;
+      var images = [];
+      var frameMode = false;
+      var raf = 0;
+      frameUrls.forEach(function(url) {
+        var img = new Image();
+        img.src = url;
+        images.push(img);
+      });
+      if (frameEl && frameUrls[0]) frameEl.src = frameUrls[0];
+      function showFrame() {
+        if (!frameEl || !images.length) return;
+        var t = lastX / Math.max(1, window.innerWidth);
+        var i = Math.round(t * (images.length - 1));
+        i = Math.max(0, Math.min(images.length - 1, i));
+        var src = images[i] && images[i].src;
+        if (src && frameEl.src !== src) frameEl.src = src;
+      }
+      function useFrames() {
+        if (frameMode || !images.length) return;
+        frameMode = true;
+        if (video) video.classList.add('is-hidden');
+        if (frameEl) frameEl.classList.add('is-active');
+        showFrame();
+      }
+      function onMove(x) {
+        lastX = x;
+        if (!raf) raf = requestAnimationFrame(function() {
+          raf = 0;
+          if (frameMode) showFrame();
+          else if (video) scheduleVideo();
+        });
+      }
+      var targetTime = 0;
       var seeking = false;
       var primed = false;
       var priming = false;
-      var raf = 0;
+      var seekTimer = 0;
       function duration() {
         return (video && isFinite(video.duration) && video.duration > 0) ? video.duration : 0;
       }
-      function clamp(t, dur) {
-        if (!dur) return 0;
-        return Math.max(0, Math.min(dur - 0.04, t));
-      }
-      function homeInView() {
-        var home = document.getElementById('home');
-        if (!home) return true;
-        var r = home.getBoundingClientRect();
-        return r.bottom > 80 && r.top < window.innerHeight;
-      }
-      function schedule() {
-        if (!raf) raf = requestAnimationFrame(tick);
-      }
-      function tick() {
-        raf = 0;
+      function scheduleVideo() {
+        if (frameMode || !video) return;
         var dur = duration();
-        if (!dur || !homeInView()) return;
-        targetTime = clamp((lastX / Math.max(1, window.innerWidth)) * dur, dur);
+        if (!dur) { useFrames(); return; }
+        targetTime = Math.max(0, Math.min(dur - 0.04, (lastX / Math.max(1, window.innerWidth)) * dur));
         if (!primed) { prime(); return; }
         if (seeking) return;
         if (Math.abs(video.currentTime - targetTime) < 0.03) return;
         seeking = true;
-        try { video.currentTime = targetTime; } catch (err) { seeking = false; }
+        if (seekTimer) clearTimeout(seekTimer);
+        seekTimer = setTimeout(function() {
+          seeking = false;
+          useFrames();
+        }, 400);
+        try { video.currentTime = targetTime; } catch (err) { seeking = false; useFrames(); }
       }
       function prime() {
-        if (primed || priming || !duration()) return;
+        if (primed || priming || !duration() || !video) return;
         priming = true;
+        video.muted = true;
         var playPromise = video.play();
         function done() {
           try { video.pause(); } catch (err) {}
           primed = true;
           priming = false;
-          schedule();
+          scheduleVideo();
         }
         if (playPromise && playPromise.then) {
           playPromise.then(done).catch(function() {
             priming = false;
-            primed = true;
-            schedule();
+            useFrames();
           });
         } else {
           done();
         }
       }
-      video.addEventListener('loadedmetadata', function() { prime(); schedule(); });
-      video.addEventListener('loadeddata', function() { prime(); schedule(); });
-      video.addEventListener('seeked', function() {
-        seeking = false;
-        if (!duration()) return;
-        if (Math.abs(targetTime - video.currentTime) > 0.04) schedule();
-      });
-      window.addEventListener('mousemove', function(e) {
-        lastX = e.clientX;
-        schedule();
-      });
-      window.addEventListener('touchmove', function(e) {
-        if (e.touches && e.touches[0]) {
-          lastX = e.touches[0].clientX;
-          schedule();
-        }
-      }, { passive: true });
-      if (video.readyState >= 1) {
-        prime();
-        schedule();
+      if (video) {
+        video.muted = true;
+        video.playsInline = true;
+        video.addEventListener('loadedmetadata', function() { if (!frameMode) prime(); });
+        video.addEventListener('error', useFrames);
+        video.addEventListener('seeked', function() {
+          seeking = false;
+          if (seekTimer) clearTimeout(seekTimer);
+        });
       }
+      window.addEventListener('mousemove', function(e) { onMove(e.clientX); });
+      window.addEventListener('pointerdown', function(e) { if (!frameMode && video) prime(); onMove(e.clientX); });
+      window.addEventListener('touchmove', function(e) {
+        if (e.touches && e.touches[0]) onMove(e.touches[0].clientX);
+      }, { passive: true });
+      if (images.length) useFrames();
+      else if (video && video.readyState >= 1) prime();
+      setTimeout(function() { if (!primed) useFrames(); }, 1500);
     }
     function initVideoHoverPlay(video) {
       if (!video || video.dataset.hoverBound === '1') return;

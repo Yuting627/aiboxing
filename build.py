@@ -122,6 +122,22 @@ def scan_media() -> list:
     return media
 
 
+def scan_home_frames() -> list:
+    """扫描首页鼠标刮动用的逐帧图片。"""
+    folder = os.path.join(VIDEOS_DIR, "start-frames")
+    if not os.path.isdir(folder):
+        return []
+    names = []
+    for name in os.listdir(folder):
+        full = os.path.join(folder, name)
+        if name.startswith(".") or os.path.isdir(full):
+            continue
+        if any(name.lower().endswith(ext) for ext in IMAGE_EXT):
+            names.append(name)
+    names.sort(key=natural_key)
+    return names
+
+
 def build_page_data() -> dict:
     """读取 config 与 contents，组装页面数据（路径保持与 config 一致，由前端解析）。"""
     config = load_json(os.path.join(SOURCE, "config.json"))
@@ -134,6 +150,9 @@ def build_page_data() -> dict:
     if "boxing" not in config["pages"]:
         config["pages"]["boxing"] = {}
     config["pages"]["boxing"]["media"] = scan_media()
+    if "home" not in config["pages"]:
+        config["pages"]["home"] = {}
+    config["pages"]["home"]["scrubFrames"] = scan_home_frames()
 
     site = load_json(os.path.join(CONTENTS, "site.json"))
     home = load_json(os.path.join(CONTENTS, "home.json"))
