@@ -157,12 +157,13 @@
     .reveal.reveal-nav { transition-delay: 0.4s; }
     .reveal.reveal-home { transition-delay: 0.6s; }
     .reveal.reveal-about { transition-delay: 0.85s; }
+    .reveal.reveal-experience { transition-delay: 1.05s; }
     .reveal.reveal-boxing { transition-delay: 1.25s; }
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
-    #nav, #home, #about, #boxing { font-family: var(--font-body); color: #111; }
+    #nav, #home, #about, #experience, #boxing { font-family: var(--font-body); color: #111; }
     .nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 10;
       padding: 1rem 1.25rem;
@@ -289,66 +290,76 @@
       z-index: 1;
       min-height: 100vh;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 1.25rem 3rem;
       color: #111;
     }
-    @media (min-width: 640px) {
-      #home { padding-left: 2rem; padding-right: 2rem; }
-    }
-    @media (min-width: 768px) {
-      #home { justify-content: center; padding: 0 2.5rem; }
+    #home .section-inner {
+      position: relative;
+      z-index: 10;
+      display: block;
     }
     .home-media {
       position: absolute;
-      top: 50%;
+      top: 0;
+      left: 50%;
       right: 0;
-      transform: translateY(-50%);
+      bottom: 0;
       z-index: 0;
-      width: auto;
-      height: auto;
-      max-height: 100%;
-      max-width: min(58%, 760px);
+      height: 100%;
+      width: 50%;
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-start;
       pointer-events: none;
+      overflow: hidden;
     }
     .home-bg-video {
       display: block;
-      width: auto;
-      height: auto;
-      max-height: 100vh;
-      max-width: 100%;
-      object-fit: contain;
-      object-position: right center;
-      vertical-align: top;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: 100%;
+      object-fit: cover;
+      object-position: left center;
     }
     .home-video-fade {
+      display: block;
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0.88) 14%, rgba(255,255,255,0.28) 42%, transparent 68%);
+      background:
+        linear-gradient(to right, #fff 0%, rgba(255,255,255,0.75) 10%, rgba(255,255,255,0.22) 28%, transparent 48%),
+        linear-gradient(to left, #fff 0%, transparent 14%),
+        linear-gradient(to bottom, #fff 0%, transparent 12%),
+        linear-gradient(to top, #fff 0%, transparent 14%);
     }
     .home-content {
       position: relative;
       z-index: 10;
-      max-width: 42rem;
+      text-align: left;
+      min-width: 0;
+      max-width: 50rem;
     }
     .home-title {
       font-family: var(--title-font);
       font-weight: 700;
-      font-size: clamp(3rem, 10vw, 7rem);
-      letter-spacing: 0.12em;
-      line-height: 0.95;
+      font-size: clamp(2.8rem, 8vw, 6.2rem);
+      letter-spacing: 0.06em;
+      line-height: 1.08;
       color: #111;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0;
+    }
+    .home-title .title-accent {
+      display: inline-block;
+      font-size: 1.22em;
+      line-height: 1.02;
     }
     .home-subtitle {
       font-size: clamp(0.9rem, 2vw, 1.1rem);
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: hsl(var(--muted-foreground));
+      margin-top: 1.35em;
       margin-bottom: 2rem;
     }
     .home-pills {
@@ -399,7 +410,7 @@
     .home-pill-outline:hover { background: #111; color: #fff; }
     .home-pill-outline u { text-underline-offset: 1px; }
     .home-copy-icon { width: 12px; height: 12px; flex-shrink: 0; }
-    #about, #boxing { background: #fff; }
+    #about, #experience, #boxing { background: #fff; }
     /* 左右两列等高：grid stretch + 左列 flex 分栏 */
     #about .section-inner {
       display: grid;
@@ -435,34 +446,85 @@
       display: flex;
       align-items: stretch;
       justify-content: center;
+      min-height: 0;
     }
-    .about-photo-wrap {
-      width: fit-content;
-      max-width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-card);
-      border: 1px solid var(--glass-border);
-      background: #fff;
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      transition: transform var(--transition), box-shadow var(--transition-slow), border-color var(--transition);
-    }
-    .about-photo-wrap:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      border-color: rgba(0, 0, 0, 0.2);
-    }
-    .about-photo {
+    #about { overflow: visible; }
+    .about-lanyard {
+      position: relative;
       width: 100%;
-      max-width: 380px;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      border-radius: var(--radius-card);
+      height: 100%;
+      min-height: min(78vh, 640px);
+    }
+    .experience-title { font-family: var(--title-font); font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: 0.1em; color: #111; margin-bottom: 2.5rem; text-shadow: none; }
+    .experience-list { list-style: none; display: flex; flex-direction: column; gap: 1.75rem; margin: 0; padding: 0; }
+    .experience-item {
+      display: grid;
+      grid-template-columns: 9.5rem 2rem 1fr;
+      align-items: start;
+      column-gap: 1.25rem;
+      position: relative;
+    }
+    .experience-period {
+      padding-top: 1.35rem;
+      text-align: right;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      color: hsl(var(--muted-foreground));
+      white-space: nowrap;
+      transition: color var(--transition), text-shadow var(--transition);
+    }
+    .experience-axis {
+      position: relative;
+      width: 2rem;
+      align-self: stretch;
+      display: flex;
+      justify-content: center;
+    }
+    .experience-axis::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: -1.75rem;
+      left: 50%;
+      width: 1px;
+      background: rgba(17, 17, 17, 0.18);
+      transform: translateX(-50%);
+    }
+    .experience-item:last-child .experience-axis::before { bottom: auto; height: 1.45rem; }
+    .experience-dot {
+      position: relative;
+      z-index: 1;
+      width: 14px;
+      height: 14px;
+      margin-top: 1.45rem;
+      border-radius: 50%;
+      border: 1.5px solid #111;
       background: #fff;
+      flex-shrink: 0;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .experience-item:hover .experience-period {
+      color: #111;
+      text-shadow: 0 2px 10px rgba(17, 17, 17, 0.28), 0 1px 3px rgba(17, 17, 17, 0.16);
+    }
+    .experience-item:hover .experience-dot {
+      transform: scale(1.12);
+      box-shadow: 0 4px 14px rgba(17, 17, 17, 0.32), 0 0 0 3px rgba(17, 17, 17, 0.06);
+    }
+    .experience-card { padding: 1.25rem 1.5rem; }
+    .experience-card .experience-role {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #111;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.01em;
+    }
+    .experience-card .experience-summary {
+      color: hsl(var(--muted-foreground));
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin: 0;
     }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
     #boxing { background: #fff; }
@@ -604,31 +666,41 @@
     @media (max-width: 767px) {
       body.nav-menu-open { overflow: hidden; }
       section { padding: calc(var(--gap) * 1.2); min-height: auto; padding-top: 5rem; padding-bottom: 4rem; }
-      #home { min-height: 100vh; height: 100vh; padding: 0 1.25rem 3rem; justify-content: flex-end; }
-      .home-media {
-        top: 0;
-        right: 0;
-        transform: none;
-        max-width: 100%;
-        max-height: 46%;
-      }
-      .home-bg-video {
-        max-height: 46vh;
-        margin-left: auto;
-      }
+      #home { min-height: 100vh; height: 100vh; }
+      #home .section-inner { display: flex; align-items: flex-end; min-height: calc(100vh - 8rem); }
+      .home-media { left: 50%; right: 0; width: 50%; }
+      .home-bg-video { width: 100%; height: 100%; object-fit: cover; object-position: left center; }
       .home-video-fade {
-        background: linear-gradient(to bottom, transparent 35%, rgba(255,255,255,0.55) 70%, #fff 100%);
+        background:
+          linear-gradient(to top, #fff 0%, rgba(255,255,255,0.88) 22%, rgba(255,255,255,0.2) 48%, transparent 68%),
+          linear-gradient(to right, #fff 0%, rgba(255,255,255,0.45) 16%, transparent 42%),
+          linear-gradient(to left, #fff 0%, transparent 12%),
+          linear-gradient(to bottom, #fff 0%, transparent 12%);
       }
-      .home-title { font-size: clamp(2rem, 10vw, 3.5rem); letter-spacing: 0.06em; }
-      .home-subtitle { font-size: 0.8rem; margin-bottom: 1.5rem; }
+      .home-title { font-size: clamp(2.6rem, 11vw, 4.4rem); letter-spacing: 0.05em; }
+      .home-subtitle { font-size: 0.8rem; margin-top: 1.35em; margin-bottom: 1.5rem; }
       #about .section-inner { grid-template-columns: 1fr; gap: 1.5rem; min-height: auto; text-align: center; }
       #about .about-left-col { order: 1; }
       #about .about-me { text-align: center; padding-right: 0; }
       #about .about-me .about-intro-text { max-width: none; margin: 0 auto; }
       #about .skills-card .skills-icons { justify-content: center; }
       #about .about-right-col { order: 2; }
-      #about .about-photo-wrap { justify-content: center; }
-      .about-photo { max-width: 280px; }
+      .about-lanyard { min-height: 380px; }
+      .experience-title { margin-bottom: 1.75rem; text-align: left; }
+      .experience-list { gap: 1.25rem; }
+      .experience-item { grid-template-columns: 1.25rem 1fr; column-gap: 0.85rem; }
+      .experience-period {
+        grid-column: 2;
+        grid-row: 1;
+        text-align: left;
+        padding-top: 0;
+        white-space: normal;
+      }
+      .experience-axis { grid-column: 1; grid-row: 1 / span 2; }
+      .experience-axis::before { bottom: -1.25rem; }
+      .experience-item:last-child .experience-axis::before { height: 0.85rem; }
+      .experience-dot { margin-top: 0.2rem; }
+      .experience-card { grid-column: 2; grid-row: 2; padding: 1rem 1.25rem; }
       .boxing-header { grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2rem; text-align: center; }
       .boxing-avatar-wrap { width: 120px; height: 120px; margin: 0 auto; }
       .boxing-intro-card { padding: 1rem 1.25rem; }
@@ -649,6 +721,7 @@
       .reveal { opacity: 1; transform: translateY(0); transition: none; }
       body .intro-overlay { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
       .boxing-avatar-wrap:hover::before { animation: none; }
+      .experience-item:hover .experience-dot { transform: none; }
     }
   </style>
 </head>
@@ -669,10 +742,11 @@
     },
     "pages": {
       "home": {
-        "backgroundVideo": "e2a6f8d7693a2cbdd32992505d6642ed.mp4"
+        "backgroundVideo": "start.mp4"
       },
       "about": {
-        "video": "e854eb0edb8a87d38c78c79600c1bfa3.mp4"
+        "video": "e854eb0edb8a87d38c78c79600c1bfa3.mp4",
+        "badgePhoto": "bage_photo.jpg"
       },
       "boxing": {
         "avatar": "boxing-avatar.jpg",
@@ -779,6 +853,11 @@
           },
           {
             "type": "video",
+            "src": "start.mp4",
+            "thumb": "start.jpg"
+          },
+          {
+            "type": "video",
             "src": "微信视频2026-02-16_152241_467.mp4",
             "thumb": "微信视频2026-02-16_152241_467.jpg"
           },
@@ -845,13 +924,17 @@
         "label": "ABOUT"
       },
       {
+        "id": "experience",
+        "label": "EXPERIENCE"
+      },
+      {
         "id": "boxing",
         "label": "AI BOXING"
       }
     ]
   },
   "home": {
-    "title": "YUTING FENG",
+    "title": "Hi I am\nYuting Feng",
     "subtitle": "Data Science & Project Management",
     "contacts": [
       {
@@ -863,7 +946,7 @@
   },
   "about": {
     "title": "About Me",
-    "intro": "Detail-oriented Data Analysis Manager with extensive experience in data science. Proficient in leading analytical teams, designing and optimizing workflows, and delivering actionable market insights to identify trends and consumer preferences.\n\n Beyond work, I live a dual life: boxing and coding. Boxing forges my grit and focus, while coding builds logic and order. AI is my superpower, turning my wildest ideas into tangible IP."
+    "intro": "Detail-oriented Data Analysis Manager with extensive experience in data science. Proficient in leading analytical teams, designing and optimizing workflows, and delivering actionable market insights to identify trends and consumer preferences.\\n\\n Beyond work, I live a dual life: boxing and coding. Boxing forges my grit and focus, while coding builds logic and order. AI is my superpower, turning my wildest ideas into tangible IP."
   },
   "skills": {
     "title": "MY SKILLS",
@@ -874,12 +957,28 @@
         "alt": "Python"
       },
       {
+        "src": "icons/skill-Rlogo.svg",
+        "alt": "R"
+      },
+      {
         "src": "icons/mysql-logo-pure.svg",
         "alt": "SQL"
       },
       {
+        "src": "icons/skill-pytorch.png",
+        "alt": "PyTorch"
+      },
+      {
         "src": "icons/power-bi.svg",
         "alt": "Power BI"
+      },
+      {
+        "src": "icons/skill-tableau-logo.svg",
+        "alt": "Tableau"
+      },
+      {
+        "src": "icons/skill-github.svg",
+        "alt": "GitHub"
       },
       {
         "src": "icons/cursor.svg",
@@ -888,6 +987,35 @@
       {
         "src": "icons/pmi-6.svg",
         "alt": "Project Management"
+      }
+    ]
+  },
+  "experience": {
+    "title": "Work Experience",
+    "items": [
+      {
+        "period": "2014.11 – 2017.8",
+        "role": "Associate Manager",
+        "company": "NielsenIQ - GDDC",
+        "summary": "Responsible for Hong Kong, Macau, and Taiwan retail research, covering sampling design, quality control, and population estimation. Built an NLP-enabled address matching system for Hong Kong that improved identification accuracy and reduced manual operations."
+      },
+      {
+        "period": "2017.8 – 2019.4",
+        "role": "Manager",
+        "company": "Nielsen - DAR",
+        "summary": "Owned methodology and core algorithms for digital advertisement rating products, partnering with engineering to ship iterations. Cut R-based factor computation from 40 minutes to under 10 seconds, and lifted age-prediction accuracy from 67% to 91% with XGBoost."
+      },
+      {
+        "period": "2019.4 – 2026.7",
+        "role": "Analytics Manager",
+        "company": "DIA - Data Science",
+        "summary": "Directed Dewu’s end-to-end market analysis system—from insight mining to dashboard delivery—and launched real-time market monitoring. Built a Python analytics stack that reduced manual reporting by over 90%, and embedded LLMs to upgrade automotive after-sales category recognition."
+      },
+      {
+        "period": "2026.7 – Present",
+        "role": "Data Science",
+        "company": "NielsenIQ - Data Science Methods",
+        "summary": "Leading data science work at NielsenIQ, applying market analytics and AI-enabled insight delivery across measurement products."
       }
     ]
   },
@@ -916,10 +1044,12 @@
       <video id="home-bg-video" class="home-bg-video" muted playsinline webkit-playsinline preload="auto"></video>
       <div class="home-video-fade" id="home-video-fade" aria-hidden="true"></div>
     </div>
-    <div class="home-content">
-      <h1 class="home-title" id="home-title">YUTING FENG</h1>
-      <p class="home-subtitle" id="home-subtitle">Data Science & Project Management</p>
-      <div class="home-pills" id="home-pills"></div>
+    <div class="section-inner">
+      <div class="home-content">
+        <h1 class="home-title" id="home-title">Hi I am<br><span class="title-accent">Yuting Feng</span></h1>
+        <p class="home-subtitle" id="home-subtitle">Data Science & Project Management</p>
+        <div class="home-pills" id="home-pills"></div>
+      </div>
     </div>
   </section>
   <section id="about" class="reveal reveal-about">
@@ -940,8 +1070,14 @@
         </div>
       </div>
       <div class="about-right-col">
-        <div class="about-photo-wrap"><video class="about-photo" id="about-photo" muted playsinline loop preload="auto"></video></div>
+        <div class="about-lanyard" id="about-lanyard" aria-label="Work badge"></div>
       </div>
+    </div>
+  </section>
+  <section id="experience" class="reveal reveal-experience">
+    <div class="section-inner">
+      <h2 class="experience-title" id="experience-title">Work Experience</h2>
+      <ol class="experience-list" id="experience-list"></ol>
     </div>
   </section>
   <section id="boxing" class="reveal reveal-boxing">
@@ -964,6 +1100,11 @@
       </div>
     </div>
   </section>
+  <link rel="stylesheet" href="source/js/lanyard-aiboxing.css" />
+  <script>
+    window.process = window.process || { env: { NODE_ENV: 'production' } };
+  </script>
+  <script src="source/js/lanyard-bundle.js"></script>
   <div class="modal" id="media-modal">
     <button type="button" class="modal-close" id="modal-close" aria-label="关闭">&times;</button>
     <div id="modal-content-wrap"></div>
@@ -1028,6 +1169,12 @@
     function escapeHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function titleWithAccent(text, mode) {
       if (!text || typeof text !== 'string') return '';
+      if (text.indexOf('\n') >= 0) {
+        var lines = text.split('\n');
+        return lines.map(function(line, i) {
+          return titleWithAccent(line, i === lines.length - 1 ? (mode || 'last') : 'none');
+        }).join('<br>');
+      }
       var words = text.trim().split(/\s+/);
       if (words.length === 0) return '';
       if (words.length === 1) return mode === 'none' ? escapeHtml(words[0]) : '<span class="title-accent">' + escapeHtml(words[0]) + '</span>';
@@ -1101,7 +1248,17 @@
       if (!data) return;
       var titleEl = document.getElementById('home-title');
       var subEl = document.getElementById('home-subtitle');
-      if (titleEl) titleEl.innerHTML = titleWithAccent(data.title || 'YUTING FENG');
+      if (titleEl) {
+        var homeTitle = data.title || 'Hi I am\nYuting Feng';
+        if (homeTitle.indexOf('\n') >= 0) {
+          titleEl.innerHTML = homeTitle.split('\n').map(function(line, i, lines) {
+            var safe = escapeHtml(line);
+            return i === lines.length - 1 ? '<span class="title-accent">' + safe + '</span>' : safe;
+          }).join('<br>');
+        } else {
+          titleEl.innerHTML = titleWithAccent(homeTitle, 'last');
+        }
+      }
       if (subEl) subEl.textContent = data.subtitle || 'Data Science & Project Management';
       var videoEl = document.getElementById('home-bg-video');
       var videoName = config && config.pages && config.pages.home && config.pages.home.backgroundVideo;
@@ -1129,14 +1286,18 @@
       var introEl = document.getElementById('about-intro');
       var intro = (data.intro || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       introEl.innerHTML = intro.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-      var videoEl = document.getElementById('about-photo');
-      var videoName = config && config.pages && config.pages.about && config.pages.about.video;
-      var videoUrl = config ? getPageVideo(config, 'about', 'video') : '';
-      if (videoEl && videoUrl) {
-        videoEl.poster = videoPosterUrl(videoName);
-        videoEl.src = videoUrl;
-        videoEl.load();
-        initVideoHoverPlay(videoEl);
+      var mount = document.getElementById('about-lanyard');
+      var photoName = config && config.pages && config.pages.about && config.pages.about.badgePhoto;
+      var photoUrl = photoName ? ('source/' + photoName) : 'source/bage_photo.jpg';
+      if (mount && typeof window.mountAboutLanyard === 'function') {
+        try {
+          window.mountAboutLanyard(mount, { frontImage: photoUrl });
+        } catch (err) {
+          console.error(err);
+          mount.innerHTML = '<img class="about-lanyard-fallback" src="' + photoUrl + '" alt="Yuting Feng" />';
+        }
+      } else if (mount) {
+        mount.innerHTML = '<img class="about-lanyard-fallback" src="' + photoUrl + '" alt="Yuting Feng" />';
       }
     }
     function setSkills(data) {
@@ -1145,6 +1306,26 @@
       document.getElementById('skills-desc').textContent = data.description || '';
       var wrap = document.getElementById('skills-icons');
       wrap.innerHTML = (data.softwareIcons || []).map(function(s) { return '<img src="' + resolvePath(s.src) + '" alt="' + (s.alt || '') + '" title="' + (s.alt || '') + '" />'; }).join('');
+    }
+    function setExperience(data) {
+      if (!data) return;
+      var titleEl = document.getElementById('experience-title');
+      if (titleEl) titleEl.innerHTML = titleWithAccent(data.title || 'Work Experience');
+      var listEl = document.getElementById('experience-list');
+      if (!listEl) return;
+      var items = Array.isArray(data.items) ? data.items : [];
+      listEl.innerHTML = items.map(function(item) {
+        var company = escapeHtml(item.company || '');
+        var heading = company ? '<h3 class="experience-role">' + company + '</h3>' : '';
+        return '<li class="experience-item">' +
+          '<div class="experience-period">' + escapeHtml(item.period || '') + '</div>' +
+          '<div class="experience-axis" aria-hidden="true"><span class="experience-dot"></span></div>' +
+          '<article class="card experience-card">' +
+            heading +
+            '<p class="experience-summary">' + escapeHtml(item.summary || '') + '</p>' +
+          '</article>' +
+        '</li>';
+      }).join('');
     }
     function setBoxing(data, config) {
       if (!data) return;
@@ -1283,13 +1464,19 @@
       video.dataset.scrubBound = '1';
       video.muted = true;
       video.playsInline = true;
+      video.preload = 'auto';
       var targetTime = 0;
+      var lastX = window.innerWidth * 0.5;
       var seeking = false;
       var primed = false;
       var priming = false;
+      var raf = 0;
+      function duration() {
+        return (video && isFinite(video.duration) && video.duration > 0) ? video.duration : 0;
+      }
       function clamp(t, dur) {
-        if (!dur || !isFinite(dur) || dur <= 0) return 0;
-        return Math.max(0, Math.min(dur, t));
+        if (!dur) return 0;
+        return Math.max(0, Math.min(dur - 0.04, t));
       }
       function homeInView() {
         var home = document.getElementById('home');
@@ -1297,48 +1484,61 @@
         var r = home.getBoundingClientRect();
         return r.bottom > 80 && r.top < window.innerHeight;
       }
-      function seekToTarget() {
-        if (!isFinite(video.duration) || video.duration <= 0) return;
-        var t = clamp(targetTime, video.duration);
-        if (Math.abs(video.currentTime - t) < 0.04) { seeking = false; return; }
+      function schedule() {
+        if (!raf) raf = requestAnimationFrame(tick);
+      }
+      function tick() {
+        raf = 0;
+        var dur = duration();
+        if (!dur || !homeInView()) return;
+        targetTime = clamp((lastX / Math.max(1, window.innerWidth)) * dur, dur);
+        if (!primed) { prime(); return; }
+        if (seeking) return;
+        if (Math.abs(video.currentTime - targetTime) < 0.03) return;
         seeking = true;
-        try { video.currentTime = t; } catch (err) { seeking = false; }
+        try { video.currentTime = targetTime; } catch (err) { seeking = false; }
       }
       function prime() {
-        if (primed || priming) return;
+        if (primed || priming || !duration()) return;
         priming = true;
         var playPromise = video.play();
-        if (playPromise && playPromise.then) {
-          playPromise.then(function() {
-            video.pause();
-            primed = true;
-            priming = false;
-            seekToTarget();
-          }).catch(function() {
-            priming = false;
-          });
-        } else {
+        function done() {
+          try { video.pause(); } catch (err) {}
           primed = true;
           priming = false;
-          seekToTarget();
+          schedule();
+        }
+        if (playPromise && playPromise.then) {
+          playPromise.then(done).catch(function() {
+            priming = false;
+            primed = true;
+            schedule();
+          });
+        } else {
+          done();
         }
       }
-      function onPointerX(x) {
-        if (!homeInView()) return;
-        if (!isFinite(video.duration) || video.duration <= 0) return;
-        targetTime = clamp((x / window.innerWidth) * video.duration, video.duration);
-        if (!primed) { prime(); return; }
-        if (!seeking) seekToTarget();
-      }
+      video.addEventListener('loadedmetadata', function() { prime(); schedule(); });
+      video.addEventListener('loadeddata', function() { prime(); schedule(); });
       video.addEventListener('seeked', function() {
         seeking = false;
-        if (!video.duration) return;
-        if (Math.abs(clamp(targetTime, video.duration) - video.currentTime) > 0.04) seekToTarget();
+        if (!duration()) return;
+        if (Math.abs(targetTime - video.currentTime) > 0.04) schedule();
       });
-      window.addEventListener('mousemove', function(e) { onPointerX(e.clientX); });
+      window.addEventListener('mousemove', function(e) {
+        lastX = e.clientX;
+        schedule();
+      });
       window.addEventListener('touchmove', function(e) {
-        if (e.touches && e.touches[0]) onPointerX(e.touches[0].clientX);
+        if (e.touches && e.touches[0]) {
+          lastX = e.touches[0].clientX;
+          schedule();
+        }
       }, { passive: true });
+      if (video.readyState >= 1) {
+        prime();
+        schedule();
+      }
     }
     function initVideoHoverPlay(video) {
       if (!video || video.dataset.hoverBound === '1') return;
@@ -1369,7 +1569,7 @@
       paths.icons = config.paths.icons || '';
       paths.videos = config.paths.videos || '';
       paths.contents = config.paths.contents || '';
-      var site = data.site, home = data.home, about = data.about, skills = data.skills, boxing = data.boxing;
+      var site = data.site, home = data.home, about = data.about, skills = data.skills, experience = data.experience, boxing = data.boxing;
       var bgUrl = getPageAsset(config, 'boxing', 'backgroundImage');
       if (bgUrl) {
         var pageBgEl = document.getElementById('page-bg');
@@ -1379,6 +1579,7 @@
       setHome(home, config);
       setAbout(about, config);
       setSkills(skills);
+      setExperience(experience);
       setBoxing(boxing, config);
       updateActiveNav();
     })();

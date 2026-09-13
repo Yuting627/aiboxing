@@ -72,6 +72,7 @@ def build_page_data() -> dict:
     home = load_json(os.path.join(CONTENTS, "home.json"))
     about = load_json(os.path.join(CONTENTS, "about.json"))
     skills = load_json(os.path.join(CONTENTS, "skills.json"))
+    experience = load_json(os.path.join(CONTENTS, "experience.json"))
     boxing = load_json(os.path.join(CONTENTS, "boxing.json"))
 
     # Skills 已合并到 About 页面，菜单中不再保留 SKILLS 项
@@ -99,6 +100,7 @@ def build_page_data() -> dict:
         "home": home or {},
         "about": about or {},
         "skills": skills or {},
+        "experience": experience or {},
         "boxing": boxing or {},
     }
 
@@ -118,7 +120,7 @@ def inject_embedded_data(html: str, data: dict) -> str:
         re.DOTALL,
     )
     if old_pattern.search(html):
-        html = old_pattern.sub(new_script.rstrip(), html, count=1)
+        html = old_pattern.sub(lambda _: new_script.rstrip(), html, count=1)
     else:
         html = html.replace("<body>", "<body>" + new_script, 1)
     return html
@@ -134,7 +136,7 @@ SYNC_INIT_JS = r"""    (function init() {
       paths.icons = config.paths.icons || '';
       paths.videos = config.paths.videos || '';
       paths.contents = config.paths.contents || '';
-      var site = data.site, home = data.home, about = data.about, skills = data.skills, boxing = data.boxing;
+      var site = data.site, home = data.home, about = data.about, skills = data.skills, experience = data.experience, boxing = data.boxing;
       var bgUrl = getPageAsset(config, 'boxing', 'backgroundImage');
       if (bgUrl) {
         var pageBgEl = document.getElementById('page-bg');
@@ -144,6 +146,7 @@ SYNC_INIT_JS = r"""    (function init() {
       setHome(home, config);
       setAbout(about, config);
       setSkills(skills);
+      setExperience(experience);
       setBoxing(boxing, config);
       updateActiveNav();
     })();"""

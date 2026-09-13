@@ -3,8 +3,12 @@
   "description": "Data analysis, visualization, and project coordination. Experienced in turning data into decisions and keeping projects on track.",
   "softwareIcons": [
     { "src": "icons/python-logo-only.png", "alt": "Python" },
+    { "src": "icons/skill-Rlogo.svg", "alt": "R" },
     { "src": "icons/mysql-logo-pure.svg", "alt": "SQL" },
+    { "src": "icons/skill-pytorch.png", "alt": "PyTorch" },
     { "src": "icons/power-bi.svg", "alt": "Power BI" },
+    { "src": "icons/skill-tableau-logo.svg", "alt": "Tableau" },
+    { "src": "icons/skill-github.svg", "alt": "GitHub" },
     { "src": "icons/cursor.svg", "alt": "Vibe Coding" },
     { "src": "icons/pmi-6.svg", "alt": "Project Management" }
   ]

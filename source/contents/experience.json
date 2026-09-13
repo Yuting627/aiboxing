@@ -1,0 +1,29 @@
+{
+  "title": "Work Experience",
+  "items": [
+    {
+      "period": "2014.11 – 2017.8",
+      "role": "Associate Manager",
+      "company": "NielsenIQ - GDDC",
+      "summary": "Responsible for Hong Kong, Macau, and Taiwan retail research, covering sampling design, quality control, and population estimation. Built an NLP-enabled address matching system for Hong Kong that improved identification accuracy and reduced manual operations."
+    },
+    {
+      "period": "2017.8 – 2019.4",
+      "role": "Manager",
+      "company": "Nielsen - DAR",
+      "summary": "Owned methodology and core algorithms for digital advertisement rating products, partnering with engineering to ship iterations. Cut R-based factor computation from 40 minutes to under 10 seconds, and lifted age-prediction accuracy from 67% to 91% with XGBoost."
+    },
+    {
+      "period": "2019.4 – 2026.7",
+      "role": "Analytics Manager",
+      "company": "DIA - Data Science",
+      "summary": "Directed Dewu’s end-to-end market analysis system—from insight mining to dashboard delivery—and launched real-time market monitoring. Built a Python analytics stack that reduced manual reporting by over 90%, and embedded LLMs to upgrade automotive after-sales category recognition."
+    },
+    {
+      "period": "2026.7 – Present",
+      "role": "Data Science",
+      "company": "NielsenIQ - Data Science Methods",
+      "summary": "Leading data science work at NielsenIQ, applying market analytics and AI-enabled insight delivery across measurement products."
+    }
+  ]
+}
