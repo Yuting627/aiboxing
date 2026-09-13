@@ -739,7 +739,17 @@
       transition: opacity 0.35s ease;
     }
     .boxing-avatar-wrap::after {
-      display: none;
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: 50%;
+    }
+    .boxing-avatar-wrap .boxing-avatar-video::-webkit-media-controls,
+    .boxing-avatar-wrap .boxing-avatar-video::-webkit-media-controls-enclosure,
+    .boxing-avatar-wrap .boxing-avatar-video::-webkit-media-controls-overlay-enclosure,
+    .boxing-avatar-wrap .boxing-avatar-video::-webkit-media-controls-start-playback-button {
+      display: none !important;
     }
     .boxing-avatar-wrap:hover {
       transform: translateY(-4px);
@@ -750,9 +760,8 @@
       opacity: 1;
       animation: border-flow 2.8s linear infinite;
     }
-    .boxing-avatar-wrap .boxing-avatar { width: 100%; height: 100%; object-fit: cover; display: block; border: none; position: relative; z-index: 2; }
-    .boxing-avatar-wrap .boxing-avatar-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; border: none; z-index: 2; }
-    .boxing-avatar-wrap .boxing-avatar-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; border: none; }
+    .boxing-avatar-wrap .boxing-avatar { width: 100%; height: 100%; object-fit: cover; display: block; border: none; position: relative; z-index: 2; pointer-events: none; }
+    .boxing-avatar-wrap .boxing-avatar-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; border: none; z-index: 2; pointer-events: none; }
     .boxing-avatar-wrap.avatar-playing .boxing-avatar-video { display: block; }
     .boxing-avatar-wrap.avatar-playing .boxing-avatar { display: none; }
     .boxing-intro-overlay { position: fixed; inset: 0; z-index: 150; background: hsl(var(--background)); display: none; align-items: center; justify-content: center; }
@@ -1075,7 +1084,7 @@
     <div class="section-inner">
       <div class="boxing-header">
         <div class="boxing-avatar-wrap" id="boxing-avatar-wrap">
-          <video class="boxing-avatar-video" id="boxing-avatar-video" muted playsinline webkit-playsinline loop preload="auto"></video>
+          <video class="boxing-avatar-video" id="boxing-avatar-video" muted playsinline webkit-playsinline loop preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback nopip"></video>
           <img class="boxing-avatar" id="boxing-avatar" src="" alt="Boxing" />
         </div>
         <div class="boxing-intro-card">
@@ -1452,7 +1461,12 @@
       var introPoster = videoPosterUrl(introVideoName);
       if (overlayVideo && introPoster) overlayVideo.poster = introPoster;
       var avatarVideo = document.getElementById('boxing-avatar-video');
-      if (avatarVideo && introPoster) avatarVideo.poster = introPoster;
+      if (avatarVideo) {
+        avatarVideo.disablePictureInPicture = true;
+        avatarVideo.setAttribute('disablepictureinpicture', '');
+        avatarVideo.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback nopip');
+        if (introPoster) avatarVideo.poster = introPoster;
+      }
       function startIntroPlay() {
         if (!overlay || !overlayInner || !overlayVideo || !introVideoUrl) return;
         overlayInner.removeAttribute('style');
