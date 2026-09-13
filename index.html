@@ -312,6 +312,9 @@
       justify-content: flex-start;
       pointer-events: none;
       overflow: hidden;
+      background-size: cover;
+      background-position: left center;
+      background-repeat: no-repeat;
     }
     .home-bg-video {
       display: block;
@@ -1464,7 +1467,10 @@
       var videoName = config && config.pages && config.pages.home && config.pages.home.backgroundVideo;
       var videoUrl = config ? getPageVideo(config, 'home', 'backgroundVideo') : '';
       if (videoEl && videoUrl) {
-        videoEl.poster = videoPosterUrl(videoName);
+        var poster = videoPosterUrl(videoName);
+        videoEl.poster = poster;
+        var mediaEl = document.querySelector('.home-media');
+        if (mediaEl && poster) mediaEl.style.backgroundImage = 'url(\'' + poster + '\')';
         videoEl.src = videoUrl;
         videoEl.load();
         initVideoScrub(videoEl);
